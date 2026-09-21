@@ -5,6 +5,14 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { DewMood, StageConfig } from "./stageConfig";
 
+
+function CameraRig() {
+  useFrame(({ camera }) => {
+    camera.lookAt(0, 0.35, 0);
+  });
+  return null;
+}
+
 type VisualState = {
   skyTop: THREE.Color;
   skyBottom: THREE.Color;
@@ -127,13 +135,11 @@ function Sun({ visual }: { visual: React.MutableRefObject<VisualState> }) {
           roughness={0.35}
         />
       </mesh>
-      {/* soft rays */}
-      {[0, 45, 90, 135].map((deg) => (
-        <mesh key={deg} rotation={[0, 0, (deg * Math.PI) / 180]} position={[0, 0, -0.1]}>
-          <boxGeometry args={[0.12, 2.6, 0.02]} />
-          <meshBasicMaterial color="#FFE8A0" transparent opacity={0.28} depthWrite={false} />
-        </mesh>
-      ))}
+      {/* soft halo only — no harsh spokes */}
+      <mesh scale={2.4}>
+        <sphereGeometry args={[0.85, 24, 24]} />
+        <meshBasicMaterial color="#FFF3C0" transparent opacity={0.18} depthWrite={false} />
+      </mesh>
       <pointLight ref={light} color="#FFE8A0" intensity={1.2} distance={22} />
     </group>
   );
@@ -161,9 +167,14 @@ function Terrain({ visual }: { visual: React.MutableRefObject<VisualState> }) {
 
   return (
     <group>
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.15, 0]} receiveShadow>
-        <circleGeometry args={[11, 64]} />
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.15, 2]} receiveShadow>
+        <planeGeometry args={[40, 28]} />
         <meshStandardMaterial ref={grass} color="#8FD98A" roughness={0.9} />
+      </mesh>
+      {/* far meadow fill so sky never peeks under the world */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -2.2, -6]}>
+        <planeGeometry args={[50, 20]} />
+        <meshStandardMaterial color="#7EC87E" roughness={1} />
       </mesh>
 
       {/* rolling hills */}
@@ -656,7 +667,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
       bounce = Math.sin(t * 1.6) * 0.06;
     }
 
-    ref.current.position.y = -1.45 + bounce;
+    ref.current.position.y = -1.35 + bounce;
     ref.current.scale.set(squash, 2 - squash, squash);
     ref.current.rotation.z = Math.sin(t * 1.4) * (mood === "curious" ? 0.12 : 0.06);
     ref.current.rotation.y = Math.sin(t * 0.7) * 0.15;
@@ -690,7 +701,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
   });
 
   return (
-    <group ref={ref} position={[-3.15, -1.45, 2.1]} scale={1}>
+    <group ref={ref} position={[-2.6, -1.35, 2.4]} scale={1.15}>
       {/* body */}
       <mesh scale={[1, 1.3, 1]} castShadow>
         <sphereGeometry args={[0.42, 28, 28]} />
@@ -722,21 +733,29 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
         <meshStandardMaterial color="#FFB0C8" transparent opacity={0.7} />
       </mesh>
 
-      {/* eyes */}
-      <mesh ref={leftEye} position={[-0.12, 0.1, 0.36]}>
-        <sphereGeometry args={[0.075, 14, 14]} />
-        <meshStandardMaterial color="#243850" />
+      {/* eyes — big and friendly */}
+      <mesh ref={leftEye} position={[-0.13, 0.12, 0.37]}>
+        <sphereGeometry args={[0.095, 16, 16]} />
+        <meshStandardMaterial color="#1E3048" />
       </mesh>
-      <mesh ref={rightEye} position={[0.12, 0.1, 0.36]}>
-        <sphereGeometry args={[0.075, 14, 14]} />
-        <meshStandardMaterial color="#243850" />
+      <mesh ref={rightEye} position={[0.13, 0.12, 0.37]}>
+        <sphereGeometry args={[0.095, 16, 16]} />
+        <meshStandardMaterial color="#1E3048" />
       </mesh>
-      <mesh position={[-0.1, 0.12, 0.42]}>
-        <sphereGeometry args={[0.028, 10, 10]} />
+      <mesh position={[-0.1, 0.15, 0.44]}>
+        <sphereGeometry args={[0.035, 10, 10]} />
         <meshBasicMaterial color="#FFFFFF" />
       </mesh>
-      <mesh position={[0.14, 0.12, 0.42]}>
-        <sphereGeometry args={[0.028, 10, 10]} />
+      <mesh position={[0.16, 0.15, 0.44]}>
+        <sphereGeometry args={[0.035, 10, 10]} />
+        <meshBasicMaterial color="#FFFFFF" />
+      </mesh>
+      <mesh position={[-0.15, 0.08, 0.44]}>
+        <sphereGeometry args={[0.018, 8, 8]} />
+        <meshBasicMaterial color="#FFFFFF" />
+      </mesh>
+      <mesh position={[0.11, 0.08, 0.44]}>
+        <sphereGeometry args={[0.018, 8, 8]} />
         <meshBasicMaterial color="#FFFFFF" />
       </mesh>
 
@@ -752,9 +771,9 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
         </mesh>
       </group>
 
-      {/* smile */}
-      <mesh position={[0, -0.05, 0.38]} rotation={[0.4, 0, 0]}>
-        <torusGeometry args={[0.09, 0.02, 8, 16, Math.PI]} />
+      {/* smile — curved up */}
+      <mesh position={[0, -0.08, 0.39]} rotation={[Math.PI, 0, Math.PI]}>
+        <torusGeometry args={[0.1, 0.022, 8, 20, Math.PI]} />
         <meshStandardMaterial color="#243850" />
       </mesh>
 
@@ -823,6 +842,7 @@ export function SceneContent({
 
   return (
     <>
+      <CameraRig />
       <color attach="background" args={[stage.skyBottom]} />
       <ambientLight intensity={0.72} />
       <hemisphereLight args={["#EAF5FF", "#8FD98A", 0.55]} />
