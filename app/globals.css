@@ -1,0 +1,231 @@
+:root {
+  --sky: #a8d8ff;
+  --sky-soft: #e8f4ff;
+  --grass: #9ed99a;
+  --ink: #3a4a5a;
+  --card: #ffffffcc;
+  --radius: 20px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: linear-gradient(180deg, var(--sky) 0%, var(--sky-soft) 55%, #d8f0d0 100%);
+  color: var(--ink);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  overscroll-behavior: none;
+}
+
+.dew-root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.75rem 0.75rem 1.25rem;
+}
+
+.dew-header {
+  padding: 0.35rem 0.25rem 0.6rem;
+}
+
+.dew-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.dew-logo {
+  font-size: 2.4rem;
+  filter: drop-shadow(0 2px 4px rgba(80, 140, 200, 0.35));
+}
+
+.dew-title {
+  margin: 0;
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #3d6f9a;
+  text-shadow: 0 1px 0 #fff;
+}
+
+.dew-sub {
+  margin: 0.1rem 0 0;
+  font-size: 0.95rem;
+  color: #5a7a94;
+  font-weight: 600;
+}
+
+.dew-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  min-height: 0;
+}
+
+.canvas-wrap {
+  position: relative;
+  flex: 1;
+  min-height: min(52vh, 420px);
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 8px 28px rgba(80, 140, 180, 0.25);
+  background: var(--sky-soft);
+}
+
+.dew-badge {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: rgba(255, 255, 255, 0.88);
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #3d6f9a;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.dew-badge-drop {
+  font-size: 1.1rem;
+}
+
+.caption-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--card);
+  backdrop-filter: blur(8px);
+  border-radius: var(--radius);
+  padding: 0.65rem 0.85rem;
+  box-shadow: 0 2px 12px rgba(80, 140, 180, 0.12);
+}
+
+.caption-text {
+  margin: 0;
+  flex: 1;
+  font-size: clamp(1rem, 3.5vw, 1.15rem);
+  font-weight: 600;
+  line-height: 1.35;
+  color: #3a5570;
+}
+
+.speak-btn {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border: none;
+  border-radius: 16px;
+  background: #dff0ff;
+  font-size: 1.4rem;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.speak-btn.on {
+  background: #b8e0ff;
+  box-shadow: inset 0 0 0 3px #6eb0e0;
+}
+
+.stage-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.stage-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.4rem;
+}
+
+@media (max-width: 640px) {
+  .stage-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.stage-btn {
+  min-height: 76px;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0.4rem 0.2rem;
+  touch-action: manipulation;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.08);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  font-family: inherit;
+}
+
+.stage-btn:active {
+  transform: scale(0.96);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+}
+
+.stage-btn.active {
+  outline: 3px solid #fff;
+  box-shadow: 0 0 0 4px #6eb0e0, 0 4px 0 rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.stage-emoji {
+  font-size: 1.55rem;
+  line-height: 1;
+}
+
+.stage-label {
+  font-size: clamp(0.62rem, 2vw, 0.78rem);
+  font-weight: 800;
+  color: #2f4a60;
+  text-align: center;
+  line-height: 1.1;
+}
+
+.nav-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  flex: 1;
+  min-height: 56px;
+  border: none;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #3d6f9a;
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 3px 0 rgba(80, 140, 180, 0.2);
+  font-family: inherit;
+}
+
+.nav-btn.next {
+  background: #ffe566;
+  color: #5a4a10;
+}
+
+.nav-btn:active {
+  transform: scale(0.98);
+}
