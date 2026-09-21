@@ -161,16 +161,17 @@ function Vapor({ intensity }: { intensity: number }) {
     (ref.current.material as THREE.PointsMaterial).opacity = 0.35 * intensity;
   });
 
+  const positionAttr = useMemo(
+    () => new THREE.BufferAttribute(positions, 3),
+    [positions]
+  );
+
   if (intensity < 0.05) return null;
 
   return (
     <points ref={ref}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-          count={80}
-        />
+        <primitive object={positionAttr} attach="attributes-position" />
       </bufferGeometry>
       <pointsMaterial
         color="#D6F0FF"
@@ -220,18 +221,20 @@ function Rain({
       }
     }
     ref.current.geometry.attributes.position.needsUpdate = true;
+    ref.current.geometry.setDrawRange(0, Math.min(count, max));
   });
+
+  const positionAttr = useMemo(
+    () => new THREE.BufferAttribute(positions, 3),
+    [positions]
+  );
 
   if (count < 1) return null;
 
   return (
     <points ref={ref}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-          count={Math.min(count, max)}
-        />
+        <primitive object={positionAttr} attach="attributes-position" />
       </bufferGeometry>
       <pointsMaterial
         color="#A8D4FF"
@@ -303,15 +306,16 @@ function Condensation({ visible }: { visible: boolean }) {
     const s = 1 + Math.sin(clock.elapsedTime * 2) * 0.08;
     ref.current.scale.setScalar(s);
   });
+  const positionAttr = useMemo(
+    () => new THREE.BufferAttribute(positions, 3),
+    [positions]
+  );
+
   if (!visible) return null;
   return (
     <points ref={ref} position={[0, 0.3, 0.5]}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-          count={36}
-        />
+        <primitive object={positionAttr} attach="attributes-position" />
       </bufferGeometry>
       <pointsMaterial
         color="#FFFFFF"
