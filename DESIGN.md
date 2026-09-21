@@ -1,7 +1,8 @@
-# How Rain Forms — Design Plan
+# Dew — Design Plan
 
+**Product name:** **Dew** (title: “Dew”)  
+**Lesson:** How rain forms / Rain Cycle  
 **Product:** Interactive 3D lesson that teaches a ~3-year-old how rain forms  
-**Subtitle:** Rain Cycle  
 **Audience:** Toddlers (~3 years) — delightful, never scary  
 **Status:** Phase 1 (design) — must land before UI build
 
@@ -71,13 +72,36 @@ Cos supersedes: **Next.js App Router + Vercel**. R3F keeps interactivity in `"us
 - Thunder = soft low rumble — short, quiet, starts on user tap
 - MVP uses nature props only (sun, vapor, cloud, drops, thermometer)
 
+
+---
+
+## 3b. Mascot — Dew the dewdrop
+
+Cheerful **dewdrop character** who guides the child through each stage.
+
+### Look
+- Soft teardrop / water-drop body: glossy light blue `#B8E8FF` with white highlight
+- Big friendly eyes, tiny smile — never scary
+- Small arms/legs optional (simple blobs OK for MVP)
+- Soft bounce idle animation
+
+### Role
+- Appears in UI and/or 3D scene as guide
+- Reacts per stage (points up for vapor, huddles under cloud for rain, sparkles at lightning)
+- Stage change: brief happy bounce + optional Web Speech line
+- Does **not** block taps; never covers stage buttons
+
+### MVP scope
+- 2D/CSS or simple R3F mesh dewdrop in corner of canvas + react faces via emoji/scale
+- Prefer one reusable `<DewMascot stage={n} />` driven by stage config
+
 ---
 
 ## 4. Information architecture & UX
 
 ```
 ┌─────────────────────────────────────────────┐
-│  Title: How Rain Forms                      │
+│  Title: Dew                      │
 │  Caption (optional) + Speak toggle          │
 ├─────────────────────────────────────────────┤
 │           [ Full-bleed 3D Canvas ]          │
