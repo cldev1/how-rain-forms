@@ -1,9 +1,21 @@
 {
   "status": 200,
   "hasAppError": false,
-  "errors": [
-    "console: Failed to load resource: the server responded with a status of 404 ()",
-    "console: Failed to load resource: the server responded with a status of 404 ()"
-  ],
-  "buttonCount": 7
+  "errors": [],
+  "sizes": {
+    "wrap": {
+      "w": 951.21875,
+      "h": 504.65625
+    },
+    "canvas": {
+      "w": 951.21875,
+      "h": 504.65625
+    },
+    "canvasBuf": {
+      "w": 951,
+      "h": 504
+    }
+  },
+  "buttonCount": 7,
+  "sha": "a265cd2"
 }
