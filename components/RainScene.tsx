@@ -410,7 +410,7 @@ function Mist({ visual }: { visual: React.MutableRefObject<VisualState> }) {
     if (!ref.current) return;
     const m = visual.current.mist;
     const mat = ref.current.material as THREE.PointsMaterial;
-    mat.opacity = 0.12 + m * 0.28;
+    mat.opacity = 0.08 + m * 0.18;
     ref.current.rotation.y = clock.elapsedTime * 0.02;
     ref.current.visible = m > 0.05;
   });
@@ -422,7 +422,7 @@ function Mist({ visual }: { visual: React.MutableRefObject<VisualState> }) {
       </bufferGeometry>
       <pointsMaterial
         color="#EAF4FF"
-        size={0.55}
+        size={0.28}
         transparent
         opacity={0.2}
         depthWrite={false}
