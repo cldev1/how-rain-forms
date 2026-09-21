@@ -6,20 +6,9 @@ import { StageConfig } from "./stageConfig";
 const CanvasInner = dynamic(() => import("./RainCanvasInner"), {
   ssr: false,
   loading: () => (
-    <div
-      style={{
-        width: "100%",
-        height: "100%",
-        background: "linear-gradient(180deg, #A8D8FF 0%, #E8F4FF 100%)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: "1.25rem",
-        color: "#4A6A8A",
-        fontFamily: "system-ui, sans-serif",
-      }}
-    >
-      Dew is waking up…
+    <div className="canvas-loading">
+      <div className="canvas-loading-drop" aria-hidden />
+      <p>Dew is waking up…</p>
     </div>
   ),
 });

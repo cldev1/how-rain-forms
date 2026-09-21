@@ -7,6 +7,7 @@ import CaptionBar from "./CaptionBar";
 import { STAGES, StageId, getStage } from "./stageConfig";
 import { useThunder } from "./useThunder";
 import { useNarrator } from "./useNarrator";
+import { useClickSound } from "./useClickSound";
 
 export default function DewApp() {
   const [stageId, setStageId] = useState<StageId>(1);
@@ -15,9 +16,11 @@ export default function DewApp() {
   const stage = getStage(stageId);
   const { playSoftThunder } = useThunder();
   const { speak, stop } = useNarrator(speakOn);
+  const { playClick } = useClickSound();
 
   const go = useCallback(
     (id: StageId) => {
+      void playClick();
       setStageId(id);
       const s = getStage(id);
       if (speakOn) speak(s.caption);
@@ -26,7 +29,7 @@ export default function DewApp() {
         void playSoftThunder();
       }
     },
-    [speakOn, speak, playSoftThunder]
+    [speakOn, speak, playSoftThunder, playClick]
   );
 
   const onNext = () => {
@@ -39,7 +42,6 @@ export default function DewApp() {
     go(prev);
   };
 
-  // Soft auto-reset after idle on stage 7
   useEffect(() => {
     if (stageId !== 7) return;
     const t = setTimeout(() => go(1), 50000);
@@ -52,14 +54,18 @@ export default function DewApp() {
 
   return (
     <div className="dew-root">
+      <div className="dew-bg-blobs" aria-hidden>
+        <span className="blob blob-a" />
+        <span className="blob blob-b" />
+        <span className="blob blob-c" />
+      </div>
+
       <header className="dew-header">
         <div className="dew-title-row">
-          <span className="dew-logo" aria-hidden>
-            💧
-          </span>
+          <DewLogo />
           <div>
             <h1 className="dew-title">Dew</h1>
-            <p className="dew-sub">How rain forms · with Dew the dewdrop</p>
+            <p className="dew-sub">How rain forms · tap a stage to explore</p>
           </div>
         </div>
       </header>
@@ -67,15 +73,14 @@ export default function DewApp() {
       <main className="dew-main">
         <div className="canvas-wrap">
           <RainCanvas stage={stage} flashTrigger={flashTrigger} />
-          <div className="dew-badge" aria-hidden>
-            <span className="dew-badge-drop">💧</span>
-            <span>Dew says hi!</span>
-          </div>
+          <div className="scene-glow" aria-hidden />
         </div>
+
         <CaptionBar
           stage={stage}
           speakOn={speakOn}
           onToggleSpeak={() => {
+            void playClick();
             setSpeakOn((v) => {
               const next = !v;
               if (next) speak(stage.caption);
@@ -84,6 +89,7 @@ export default function DewApp() {
             });
           }}
         />
+
         <StageButtons
           current={stageId}
           onSelect={go}
@@ -91,6 +97,50 @@ export default function DewApp() {
           onBack={onBack}
         />
       </main>
+
+      <p className="dew-foot" aria-hidden>
+        Made for little explorers · {STAGES.length} magical stages
+      </p>
     </div>
+  );
+}
+
+function DewLogo() {
+  return (
+    <svg
+      className="dew-logo-svg"
+      width="56"
+      height="64"
+      viewBox="0 0 56 64"
+      aria-hidden
+    >
+      <defs>
+        <linearGradient id="dewBody" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#E8F8FF" />
+          <stop offset="55%" stopColor="#7ED0FF" />
+          <stop offset="100%" stopColor="#4AB0F0" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M28 4C28 4 8 28 8 42a20 20 0 0040 0C48 28 28 4 28 4z"
+        fill="url(#dewBody)"
+        stroke="#5BB8E8"
+        strokeWidth="1.5"
+      />
+      <ellipse cx="20" cy="30" rx="6" ry="9" fill="#FFFFFF" opacity="0.45" />
+      <circle cx="22" cy="40" r="3.2" fill="#2A4060" />
+      <circle cx="34" cy="40" r="3.2" fill="#2A4060" />
+      <circle cx="23.2" cy="39" r="1.1" fill="#FFFFFF" />
+      <circle cx="35.2" cy="39" r="1.1" fill="#FFFFFF" />
+      <path
+        d="M23 47c2.2 2.4 7.8 2.4 10 0"
+        stroke="#2A4060"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        fill="none"
+      />
+      <circle cx="18" cy="44" r="2.4" fill="#FFB0C8" opacity="0.75" />
+      <circle cx="38" cy="44" r="2.4" fill="#FFB0C8" opacity="0.75" />
+    </svg>
   );
 }
