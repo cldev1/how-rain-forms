@@ -8,7 +8,7 @@ import { DewMood, StageConfig } from "./stageConfig";
 
 function CameraRig() {
   useFrame(({ camera }) => {
-    camera.lookAt(-0.35, 0.55, 0.35);
+    camera.lookAt(-0.3, 0.45, 0.4);
   });
   return null;
 }
@@ -692,9 +692,9 @@ function RainPuddle({ visual }: { visual: React.MutableRefObject<VisualState> })
   });
 
   return (
-    <group position={[-0.4, -2.05, 2.1]}>
+    <group position={[0.55, -2.04, 2.35]}>
       <mesh ref={mesh} rotation={[-Math.PI / 2, 0, 0.15]} visible={false}>
-        <circleGeometry args={[0.85, 32]} />
+        <circleGeometry args={[1.05, 32]} />
         <meshStandardMaterial
           color="#6EB8E0"
           transparent
@@ -736,7 +736,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
       bounce = Math.sin(t * 1.6) * 0.06;
     }
 
-    ref.current.position.y = -0.28 + bounce;
+    ref.current.position.y = 0.22 + bounce;
     ref.current.scale.set(squash, 2 - squash, squash);
     ref.current.rotation.z = Math.sin(t * 1.4) * (mood === "curious" ? 0.12 : 0.06);
     ref.current.rotation.y = Math.sin(t * 0.7) * 0.15;
@@ -770,7 +770,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
   });
 
   return (
-    <group ref={ref} position={[-1.05, -0.28, 2.4]} scale={1.15}>
+    <group ref={ref} position={[-0.95, 0.22, 2.35]} scale={1.08}>
       {/* body */}
       <mesh scale={[1, 1.3, 1]} castShadow>
         <sphereGeometry args={[0.42, 28, 28]} />
