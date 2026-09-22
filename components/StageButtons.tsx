@@ -1,6 +1,6 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useEffect, useRef, type CSSProperties } from "react";
 import { STAGES, StageId, getStage } from "./stageConfig";
 import { StageIcon } from "./StageIcons";
 
@@ -9,6 +9,7 @@ export default function StageButtons({
   onSelect,
   onNext,
   onBack,
+  celebrating,
   speakOn,
   onToggleSpeak,
 }: {
@@ -16,14 +17,25 @@ export default function StageButtons({
   onSelect: (id: StageId) => void;
   onNext: () => void;
   onBack: () => void;
+  celebrating: boolean;
   speakOn: boolean;
   onToggleSpeak: () => void;
 }) {
   const stage = getStage(current);
+  const pathRef = useRef<HTMLDivElement>(null);
+
+  // Keep active node scrolled into view (~3 visible with snap)
+  useEffect(() => {
+    const root = pathRef.current;
+    if (!root) return;
+    const active = root.querySelector(".story-node.active") as HTMLElement | null;
+    if (active) {
+      active.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
+    }
+  }, [current]);
 
   return (
     <div className="stage-panel bottom-sheet">
-      {/* Hero: one big selected stage — always readable on phone */}
       <div
         className="stage-hero"
         style={
@@ -38,9 +50,7 @@ export default function StageButtons({
         </div>
         <div className="stage-hero-copy">
           <div className="stage-hero-meta">
-            <span className="stage-hero-num">
-              {stage.id} / 7
-            </span>
+            <span className="stage-hero-num">{stage.id} / 7</span>
             <button
               type="button"
               className={`speak-btn speak-btn-inline ${speakOn ? "on" : ""}`}
@@ -51,11 +61,11 @@ export default function StageButtons({
               <SpeakIcon on={speakOn} />
             </button>
           </div>
-          <h2 className="stage-hero-label" key={`label-${stage.id}`}>
-            {stage.label}
+          <h2 className="stage-hero-label" key={`label-${stage.id}-${celebrating}`}>
+            {celebrating ? "Rain again!" : stage.label}
           </h2>
-          <p className="stage-hero-kid" key={`kid-${stage.id}`}>
-            {stage.kidLine}
+          <p className="stage-hero-kid" key={`kid-${stage.id}-${celebrating}`}>
+            {celebrating ? "Tap Again to play once more." : stage.kidLine}
           </p>
           <p className="stage-hero-caption" key={`cap-${stage.id}`}>
             {stage.caption}
@@ -63,11 +73,16 @@ export default function StageButtons({
         </div>
       </div>
 
-      {/* Story path: oversized nodes, not a 7-chip wrap */}
-      <div className="story-path" role="tablist" aria-label="Rain story path">
+      {/* Story path: scroll-snap ~3 nodes, fat-finger hit targets; Back/Next stay primary */}
+      <div
+        ref={pathRef}
+        className="story-path"
+        role="tablist"
+        aria-label="Rain story path"
+      >
         {STAGES.map((s, i) => {
-          const active = current === s.id;
-          const done = s.id < current;
+          const active = !celebrating && current === s.id;
+          const done = s.id < current || celebrating;
           return (
             <div key={s.id} className="story-path-item">
               {i > 0 && (
@@ -91,10 +106,10 @@ export default function StageButtons({
                 aria-selected={active}
               >
                 <span className="story-node-icon">
-                  <StageIcon id={s.icon} size={active ? 36 : 28} />
+                  <StageIcon id={s.icon} size={active ? 34 : 28} />
                 </span>
                 {active && (
-                  <span className="story-node-label">{s.label}</span>
+                  <span className="story-node-label">{s.shortLabel}</span>
                 )}
               </button>
             </div>
@@ -103,14 +118,20 @@ export default function StageButtons({
       </div>
 
       <div className="nav-row">
-        <button type="button" className="nav-btn" onClick={onBack}>
+        <button
+          type="button"
+          className="nav-btn"
+          onClick={onBack}
+          disabled={!celebrating && current === 1}
+          aria-disabled={!celebrating && current === 1}
+        >
           <span className="nav-chevron" aria-hidden>
             ‹
           </span>
           Back
         </button>
         <button type="button" className="nav-btn next" onClick={onNext}>
-          Next
+          {celebrating ? "Again" : current === 7 ? "Done" : "Next"}
           <span className="nav-chevron" aria-hidden>
             ›
           </span>

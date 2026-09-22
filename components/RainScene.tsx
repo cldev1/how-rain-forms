@@ -152,16 +152,25 @@ function Terrain({ visual }: { visual: React.MutableRefObject<VisualState> }) {
   const wet = useMemo(() => new THREE.Color("#5EAF6A"), []);
   const tmp = useMemo(() => new THREE.Color(), []);
 
+  const heavyWet = useMemo(() => new THREE.Color("#3E8A52"), []);
+
   useFrame(() => {
-    const wetAmt = Math.min(1, visual.current.rainCount / 200);
-    tmp.copy(dry).lerp(wet, wetAmt);
+    const rc = visual.current.rainCount;
+    const wetAmt = Math.min(1, rc / 200);
+    // Lots of Rain: darker wet-grass jump (silhouette beyond density)
+    if (rc >= 180) {
+      tmp.copy(wet).lerp(heavyWet, Math.min(1, (rc - 180) / 80));
+    } else {
+      tmp.copy(dry).lerp(wet, wetAmt);
+    }
     if (grass.current) {
       grass.current.color.copy(tmp);
-      grass.current.roughness = 0.92 - wetAmt * 0.35;
+      grass.current.roughness = 0.92 - wetAmt * 0.45 - (rc >= 180 ? 0.12 : 0);
     }
     if (pond.current) {
-      pond.current.opacity = 0.35 + wetAmt * 0.45;
-      pond.current.roughness = 0.15;
+      pond.current.opacity = 0.35 + wetAmt * 0.5;
+      pond.current.roughness = 0.12;
+      pond.current.metalness = 0.2 + wetAmt * 0.25;
     }
   });
 
@@ -296,13 +305,14 @@ function SoftCloud({
   const mats = useRef<THREE.MeshStandardMaterial[]>([]);
   const baseY = position[1];
   const puffColor = useMemo(() => new THREE.Color(), []);
+  const darkCloud = useMemo(() => new THREE.Color("#6B7A8A"), []);
 
   useFrame(({ clock }) => {
     if (!group.current) return;
     group.current.position.y =
       baseY + Math.sin(clock.elapsedTime * 0.55 + phase + position[0]) * 0.14;
     const v = visual.current;
-    puffColor.copy(v.cloudColor).lerp(new THREE.Color("#6B7A8A"), v.cloudDarkness);
+    puffColor.copy(v.cloudColor).lerp(darkCloud, v.cloudDarkness);
     for (const m of mats.current) {
       if (m) m.color.copy(puffColor);
     }
@@ -450,6 +460,10 @@ function RainStreaks({ visual }: { visual: React.MutableRefObject<VisualState> }
   const max = 360;
   const mesh = useRef<THREE.InstancedMesh>(null);
   const dummy = useMemo(() => new THREE.Object3D(), []);
+  const phoneCap = useMemo(() => {
+    if (typeof window === "undefined") return max;
+    return window.innerWidth < 480 ? 180 : max;
+  }, []);
   const { positions, velocities, phases } = useMemo(() => {
     const positions = new Float32Array(max * 3);
     const velocities = new Float32Array(max);
@@ -474,7 +488,7 @@ function RainStreaks({ visual }: { visual: React.MutableRefObject<VisualState> }
       return;
     }
     mesh.current.visible = true;
-    const n = Math.min(count, max);
+    const n = Math.min(count, phoneCap, max);
     const len = 0.18 + v.rainSize * 4.5;
     const thick = 0.012 + v.rainSize * 0.35;
     for (let i = 0; i < n; i++) {
@@ -522,26 +536,28 @@ function Thermometer({ visible }: { visible: boolean }) {
   });
 
   return (
-    <group ref={group} position={[2.15, 0.55, 1.6]}>
+    <group ref={group} position={[1.55, 0.35, 3.15]} scale={1.35}>
       <mesh>
-        <capsuleGeometry args={[0.14, 1.35, 8, 16]} />
-        <meshStandardMaterial color="#FFF8F0" roughness={0.4} />
+        <capsuleGeometry args={[0.16, 1.45, 8, 16]} />
+        <meshStandardMaterial color="#FFF8F0" roughness={0.35} />
       </mesh>
-      <mesh position={[0, -0.95, 0]}>
-        <sphereGeometry args={[0.22, 18, 18]} />
-        <meshStandardMaterial color="#FF8A6A" emissive="#FF6040" emissiveIntensity={0.35} />
+      <mesh position={[0, -1.05, 0]}>
+        <sphereGeometry args={[0.26, 18, 18]} />
+        <meshStandardMaterial color="#FF8A6A" emissive="#FF6040" emissiveIntensity={0.45} />
       </mesh>
-      <mesh ref={needle} position={[0, 0, 0.1]}>
-        <boxGeometry args={[0.1, 0.2, 0.08]} />
+      <mesh ref={needle} position={[0, 0, 0.12]}>
+        <boxGeometry args={[0.12, 0.22, 0.09]} />
         <meshStandardMaterial color="#FF8A6A" />
       </mesh>
-      <mesh position={[-0.6, -0.35, 0]} rotation={[0, 0, 0.45]}>
-        <coneGeometry args={[0.13, 0.38, 10]} />
-        <meshStandardMaterial color="#FFB060" emissive="#FF9040" emissiveIntensity={0.2} />
+      {/* warm (left / low) */}
+      <mesh position={[-0.72, -0.45, 0.05]} rotation={[0, 0, 0.45]}>
+        <coneGeometry args={[0.16, 0.44, 10]} />
+        <meshStandardMaterial color="#FFB060" emissive="#FF9040" emissiveIntensity={0.35} />
       </mesh>
-      <mesh position={[-0.6, 0.55, 0]} rotation={[0, 0, Math.PI - 0.35]}>
-        <coneGeometry args={[0.13, 0.38, 10]} />
-        <meshStandardMaterial color="#80C8FF" emissive="#60B0FF" emissiveIntensity={0.2} />
+      {/* cool (right / high) */}
+      <mesh position={[0.72, 0.55, 0.05]} rotation={[0, 0, Math.PI - 0.35]}>
+        <coneGeometry args={[0.16, 0.44, 10]} />
+        <meshStandardMaterial color="#80C8FF" emissive="#60B0FF" emissiveIntensity={0.35} />
       </mesh>
     </group>
   );
@@ -667,49 +683,216 @@ function LightningFlash({
 }
 
 
-function RainPuddle({ visual }: { visual: React.MutableRefObject<VisualState> }) {
-  const mesh = useRef<THREE.Mesh>(null);
-  const ripple = useRef<THREE.Mesh>(null);
+/** Soft mist rings — unique drizzle silhouette (stage 4) */
+function DrizzleMistRings({ visual }: { visual: React.MutableRefObject<VisualState> }) {
+  const group = useRef<THREE.Group>(null);
+  const rings = useRef<(THREE.Mesh | null)[]>([]);
 
   useFrame(({ clock }) => {
     const rc = visual.current.rainCount;
-    // Light puddle silhouette on rain / lots-of-rain (stages 5–6)
-    const show = rc >= 80 && rc < 280;
+    // Drizzle band: soft wet mist, not puddle
+    const show = rc > 20 && rc < 90;
+    if (!group.current) return;
+    group.current.visible = show;
+    if (!show) return;
+    const t = clock.elapsedTime;
+    rings.current.forEach((ring, i) => {
+      if (!ring) return;
+      const mat = ring.material as THREE.MeshBasicMaterial;
+      const pulse = (Math.sin(t * 1.6 + i * 1.1) + 1) / 2;
+      mat.opacity = 0.18 + pulse * 0.22;
+      const s = 0.85 + i * 0.35 + pulse * 0.12;
+      ring.scale.set(s, s, 1);
+    });
+  });
+
+  return (
+    <group ref={group} position={[0.2, -1.95, 2.1]} visible={false}>
+      {[0, 1, 2].map((i) => (
+        <mesh
+          key={i}
+          ref={(m) => {
+            rings.current[i] = m;
+          }}
+          rotation={[-Math.PI / 2, 0, 0]}
+          position={[i * 0.15 - 0.1, 0.02 * i, i * -0.1]}
+        >
+          <ringGeometry args={[0.35 + i * 0.15, 0.55 + i * 0.18, 28]} />
+          <meshBasicMaterial color="#D0E8F8" transparent opacity={0.25} depthWrite={false} />
+        </mesh>
+      ))}
+      {/* soft wet ground sheen for drizzle */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0.1, 0, 0.2]}>
+        <circleGeometry args={[0.7, 24]} />
+        <meshBasicMaterial color="#B8DCF0" transparent opacity={0.22} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
+/** Puddle + ripples — Rain (5) readable; Lots (6) bigger + wet shine */
+function RainPuddle({ visual }: { visual: React.MutableRefObject<VisualState> }) {
+  const mesh = useRef<THREE.Mesh>(null);
+  const ripple = useRef<THREE.Mesh>(null);
+  const ripple2 = useRef<THREE.Mesh>(null);
+  const shine = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const rc = visual.current.rainCount;
+    // Rain + Lots (not drizzle, not storm peak)
+    const show = rc >= 90 && rc < 300;
     if (!mesh.current) return;
     mesh.current.visible = show;
     if (ripple.current) ripple.current.visible = show;
+    if (ripple2.current) ripple2.current.visible = show && rc >= 180;
+    if (shine.current) shine.current.visible = show && rc >= 100;
     if (!show) return;
-    const wet = Math.min(1, (rc - 80) / 160);
+    const lots = rc >= 180;
+    const wet = Math.min(1, (rc - 90) / 150);
     const mat = mesh.current.material as THREE.MeshStandardMaterial;
-    mat.opacity = 0.55 + wet * 0.35;
-    const pulse = 1 + Math.sin(clock.elapsedTime * 2.4) * 0.04;
-    mesh.current.scale.set(pulse * (1 + wet * 0.25), 1, pulse * (1 + wet * 0.2));
+    mat.opacity = 0.62 + wet * 0.3;
+    mat.metalness = 0.28 + wet * 0.2;
+    const base = lots ? 1.55 : 1.05;
+    const pulse = 1 + Math.sin(clock.elapsedTime * 2.6) * 0.035;
+    mesh.current.scale.set(pulse * base, 1, pulse * base * 0.9);
     if (ripple.current) {
       const rm = ripple.current.material as THREE.MeshBasicMaterial;
-      rm.opacity = 0.2 + wet * 0.25 + Math.sin(clock.elapsedTime * 3) * 0.05;
-      ripple.current.scale.setScalar(1.15 + wet * 0.35 + Math.sin(clock.elapsedTime * 2.2) * 0.06);
+      rm.opacity = 0.28 + wet * 0.3 + Math.sin(clock.elapsedTime * 3.2) * 0.06;
+      ripple.current.scale.setScalar(1.05 + wet * 0.4 + Math.sin(clock.elapsedTime * 2.4) * 0.08);
+    }
+    if (ripple2.current) {
+      const rm = ripple2.current.material as THREE.MeshBasicMaterial;
+      rm.opacity = 0.2 + Math.sin(clock.elapsedTime * 2.8 + 1) * 0.08;
+      ripple2.current.scale.setScalar(1.35 + Math.sin(clock.elapsedTime * 2) * 0.1);
+    }
+    if (shine.current) {
+      const sm = shine.current.material as THREE.MeshBasicMaterial;
+      sm.opacity = 0.2 + wet * 0.25 + Math.sin(clock.elapsedTime * 4) * 0.05;
     }
   });
 
   return (
-    <group position={[0.55, -2.04, 2.35]}>
+    <group position={[0.55, -2.03, 2.35]}>
       <mesh ref={mesh} rotation={[-Math.PI / 2, 0, 0.15]} visible={false}>
-        <circleGeometry args={[1.05, 32]} />
+        <circleGeometry args={[1.05, 36]} />
         <meshStandardMaterial
-          color="#6EB8E0"
+          color="#5EB0DC"
           transparent
-          opacity={0.65}
-          roughness={0.12}
-          metalness={0.25}
+          opacity={0.7}
+          roughness={0.08}
+          metalness={0.3}
           depthWrite={false}
         />
       </mesh>
-      <mesh ref={ripple} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} visible={false}>
-        <ringGeometry args={[0.55, 0.72, 28]} />
-        <meshBasicMaterial color="#A8D8F0" transparent opacity={0.25} depthWrite={false} />
+      <mesh ref={shine} rotation={[-Math.PI / 2, 0, 0]} position={[0.15, 0.015, -0.1]} scale={[1, 0.55, 1]} visible={false}>
+        <circleGeometry args={[0.35, 20]} />
+        <meshBasicMaterial color="#E8F8FF" transparent opacity={0.3} depthWrite={false} />
+      </mesh>
+      <mesh ref={ripple} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.02, 0]} visible={false}>
+        <ringGeometry args={[0.45, 0.68, 32]} />
+        <meshBasicMaterial color="#A8D8F0" transparent opacity={0.32} depthWrite={false} />
+      </mesh>
+      <mesh ref={ripple2} rotation={[-Math.PI / 2, 0, 0]} position={[0.1, 0.025, 0.05]} visible={false}>
+        <ringGeometry args={[0.7, 0.95, 32]} />
+        <meshBasicMaterial color="#90C8E8" transparent opacity={0.22} depthWrite={false} />
       </mesh>
     </group>
   );
+}
+
+/** Toy umbrella — unique Lots-of-Rain silhouette */
+function RainUmbrella({ visual }: { visual: React.MutableRefObject<VisualState> }) {
+  const group = useRef<THREE.Group>(null);
+
+  useFrame(({ clock }) => {
+    const rc = visual.current.rainCount;
+    const show = rc >= 180 && rc < 300;
+    if (!group.current) return;
+    group.current.visible = show;
+    if (!show) return;
+    group.current.rotation.z = Math.sin(clock.elapsedTime * 1.8) * 0.06;
+    group.current.position.y = -0.55 + Math.sin(clock.elapsedTime * 2.2) * 0.03;
+  });
+
+  return (
+    <group ref={group} position={[2.05, -0.55, 2.55]} visible={false} scale={0.95}>
+      {/* pole */}
+      <mesh position={[0, -0.55, 0]}>
+        <cylinderGeometry args={[0.035, 0.04, 1.1, 8]} />
+        <meshStandardMaterial color="#8B6914" />
+      </mesh>
+      {/* canopy */}
+      <mesh position={[0, 0.05, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.72, 0.42, 12]} />
+        <meshStandardMaterial
+          color="#FF8AB0"
+          roughness={0.45}
+          emissive="#FF6090"
+          emissiveIntensity={0.15}
+        />
+      </mesh>
+      <mesh position={[0, 0.12, 0]}>
+        <sphereGeometry args={[0.08, 10, 10]} />
+        <meshStandardMaterial color="#FFE566" />
+      </mesh>
+      {/* little splash dots under rim */}
+      {[-0.35, 0, 0.35].map((x, i) => (
+        <mesh key={i} position={[x, -0.95, 0.15]}>
+          <sphereGeometry args={[0.05, 8, 8]} />
+          <meshBasicMaterial color="#A0D8FF" transparent opacity={0.7} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+/** Warm-left / cool-right sky split for stage 2 pedagogy */
+function WarmCoolSplit({ active }: { active: boolean }) {
+  const group = useRef<THREE.Group>(null);
+  useFrame(({ clock }) => {
+    if (!group.current) return;
+    group.current.visible = active;
+    if (!active) return;
+    const bob = Math.sin(clock.elapsedTime * 0.6) * 0.04;
+    group.current.position.y = bob;
+  });
+
+  return (
+    <group ref={group} visible={false}>
+      {/* warm left wash */}
+      <mesh position={[-4.2, 2.4, -12]} scale={[10, 14, 1]}>
+        <planeGeometry />
+        <meshBasicMaterial color="#FFB060" transparent opacity={0.42} depthWrite={false} />
+      </mesh>
+      <mesh position={[-2.2, 1.2, -11.5]} scale={[5, 8, 1]}>
+        <planeGeometry />
+        <meshBasicMaterial color="#FFE090" transparent opacity={0.28} depthWrite={false} />
+      </mesh>
+      {/* cool right wash */}
+      <mesh position={[4.2, 2.6, -12]} scale={[10, 14, 1]}>
+        <planeGeometry />
+        <meshBasicMaterial color="#78B8FF" transparent opacity={0.45} depthWrite={false} />
+      </mesh>
+      <mesh position={[2.4, 3.2, -11.5]} scale={[5, 7, 1]}>
+        <planeGeometry />
+        <meshBasicMaterial color="#A8D4FF" transparent opacity={0.3} depthWrite={false} />
+      </mesh>
+      {/* soft divider glow */}
+      <mesh position={[0.15, 2.2, -11]} scale={[1.2, 12, 1]}>
+        <planeGeometry />
+        <meshBasicMaterial color="#FFF8E8" transparent opacity={0.22} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
+function SceneBackground({ visual }: { visual: React.MutableRefObject<VisualState> }) {
+  useFrame(({ scene }) => {
+    if (scene.background instanceof THREE.Color) {
+      scene.background.copy(visual.current.skyBottom);
+    }
+  });
+  return <color attach="background" args={["#F2F9FF"]} />;
 }
 
 function DewMascot3D({ mood }: { mood: DewMood }) {
@@ -747,17 +930,19 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
     if (rightEye.current) rightEye.current.scale.y = blink;
 
     if (brows.current) {
-      brows.current.position.y = mood === "thinking" ? 0.22 : 0.18;
-      brows.current.rotation.z = mood === "curious" ? 0.15 : 0;
+      brows.current.position.y = mood === "curious" ? 0.2 : 0.18;
+      brows.current.rotation.z = mood === "curious" ? 0.22 : 0;
     }
 
     if (arms.current) {
       const raise =
         mood === "excited" || mood === "sparkly" || mood === "happy"
           ? 0.8 + Math.sin(t * 4) * 0.25
-          : mood === "splashy"
-            ? 0.3 + Math.sin(t * 3) * 0.2
-            : 0.1;
+          : mood === "curious"
+            ? 0.45 + Math.sin(t * 2.4) * 0.15
+            : mood === "splashy"
+              ? 0.3 + Math.sin(t * 3) * 0.2
+              : 0.1;
       arms.current.children.forEach((arm, i) => {
         arm.rotation.z = (i === 0 ? 1 : -1) * (0.4 + raise);
       });
@@ -897,7 +1082,6 @@ export function SceneContent({
 }) {
   const visual = useRef<VisualState>(makeVisual(stage));
   const target = useRef<VisualState>(makeVisual(stage));
-  const bg = useRef<THREE.Color>(new THREE.Color(stage.skyBottom));
 
   useEffect(() => {
     target.current = makeVisual(stage);
@@ -906,18 +1090,18 @@ export function SceneContent({
   useFrame((_, dt) => {
     const t = 1 - Math.exp(-dt * 3.6);
     lerpVisual(visual.current, target.current, t);
-    bg.current.copy(visual.current.skyBottom);
   });
 
   return (
     <>
       <CameraRig />
-      <color attach="background" args={[stage.skyBottom]} />
+      <SceneBackground visual={visual} />
       <ambientLight intensity={0.72} />
       <hemisphereLight args={["#EAF5FF", "#8FD98A", 0.55]} />
       <directionalLight position={[5, 9, 4]} intensity={0.75} color="#FFF6E8" />
 
       <SkyBackdrop visual={visual} />
+      <WarmCoolSplit active={stage.showThermo} />
       <Sun visual={visual} />
       <Terrain visual={visual} />
 
@@ -929,7 +1113,9 @@ export function SceneContent({
       <Vapor visual={visual} />
       <Mist visual={visual} />
       <RainStreaks visual={visual} />
+      <DrizzleMistRings visual={visual} />
       <RainPuddle visual={visual} />
+      <RainUmbrella visual={visual} />
       <Thermometer visible={stage.showThermo} />
       <Condensation visible={stage.showCondensation} />
       <LightningFlash active={stage.showLightning} trigger={flashTrigger} />

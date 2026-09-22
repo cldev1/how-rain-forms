@@ -1,5 +1,8 @@
 # Dew — Product + Code Review & Improvement Plan
 
+> **Update 2026-09-22 IST (improve2):** Shipped Warm & Cool clarity, mid-stage silhouettes (4/5/6), story-path fat-finger scroll-snap, end-of-story “Rain again!”, SoftCloud/rain perf hygiene, kidLine narrator + aria-live, CaptionBar/drei cleanup. Prior phone-trust (viewport lock, flash gate, WebGL fallback, drizzle) remains on main. Leftovers: reduced-motion for R3F, mute SFX, parent tip sheet, art pass (P3).
+
+
 **Date:** 2026-09-22 IST  
 **Live:** https://how-rain-forms.vercel.app  
 **Repo:** cldev1/how-rain-forms (`main` @ `4048305` / phone-first lineage from `07e49ea`)  

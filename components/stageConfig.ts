@@ -12,6 +12,8 @@ export type DewMood =
 export interface StageConfig {
   id: StageId;
   label: string;
+  /** Compact path label (avoids truncation) */
+  shortLabel: string;
   /** Ultra-short kid line shown on the hero card */
   kidLine: string;
   caption: string;
@@ -54,6 +56,7 @@ export const STAGES: StageConfig[] = [
   {
     id: 1,
     label: "Clouds",
+    shortLabel: "Clouds",
     kidLine: "Water goes up!",
     caption: "Warm water goes up and makes a soft cloud.",
     skyTop: "#6EC8FF",
@@ -78,6 +81,7 @@ export const STAGES: StageConfig[] = [
   {
     id: 2,
     label: "Warm & Cool",
+    shortLabel: "Warm",
     kidLine: "Up high it cools.",
     caption: "Warm wet air goes up. Up high it gets cooler.",
     skyTop: "#FF9A4A",
@@ -94,7 +98,7 @@ export const STAGES: StageConfig[] = [
     showThermo: true,
     showCondensation: false,
     showLightning: false,
-    dewMood: "thinking",
+    dewMood: "curious",
     buttonBg: "#FFE0A0",
     buttonAccent: "#E08820",
     icon: "thermo",
@@ -102,6 +106,7 @@ export const STAGES: StageConfig[] = [
   {
     id: 3,
     label: "Tiny Drops",
+    shortLabel: "Drops",
     kidLine: "Little drops form.",
     caption: "Water sticks to tiny dust and makes little drops.",
     skyTop: "#B8A0E8",
@@ -126,6 +131,7 @@ export const STAGES: StageConfig[] = [
   {
     id: 4,
     label: "Drizzle",
+    shortLabel: "Drizzle",
     kidLine: "Soft drops fall.",
     caption: "Soft little drops start to fall.",
     skyTop: "#9AB8D0",
@@ -150,6 +156,7 @@ export const STAGES: StageConfig[] = [
   {
     id: 5,
     label: "Rain",
+    shortLabel: "Rain",
     kidLine: "Steady rain!",
     caption: "Steady rain falls down to the ground.",
     skyTop: "#4A88C0",
@@ -174,6 +181,7 @@ export const STAGES: StageConfig[] = [
   {
     id: 6,
     label: "Lots of Rain",
+    shortLabel: "Lots",
     kidLine: "Big rain!",
     caption: "Big rain! Lots of drops.",
     skyTop: "#3A5A78",
@@ -198,6 +206,7 @@ export const STAGES: StageConfig[] = [
   {
     id: 7,
     label: "Storm Fun",
+    shortLabel: "Storm",
     kidLine: "Flash! Boom!",
     caption: "Darker soft clouds, a friendly flash, and rain!",
     skyTop: "#3A3A68",

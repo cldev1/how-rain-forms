@@ -12,6 +12,7 @@ export default function DewApp() {
   const [stageId, setStageId] = useState<StageId>(1);
   const [flashTrigger, setFlashTrigger] = useState(0);
   const [speakOn, setSpeakOn] = useState(false);
+  const [celebrating, setCelebrating] = useState(false);
   const stage = getStage(stageId);
   const { playSoftThunder } = useThunder();
   const { speak, stop } = useNarrator(speakOn);
@@ -20,9 +21,10 @@ export default function DewApp() {
   const go = useCallback(
     (id: StageId) => {
       void playClick();
+      setCelebrating(false);
       setStageId(id);
       const s = getStage(id);
-      if (speakOn) speak(s.caption);
+      if (speakOn) speak(s.kidLine);
       if (s.showLightning) {
         setFlashTrigger((n) => n + 1);
         void playSoftThunder();
@@ -32,29 +34,56 @@ export default function DewApp() {
   );
 
   const onNext = () => {
-    const next = (stageId === 7 ? 1 : stageId + 1) as StageId;
-    go(next);
+    if (celebrating) {
+      go(1);
+      return;
+    }
+    if (stageId === 7) {
+      void playClick();
+      setCelebrating(true);
+      if (speakOn) speak("Rain again!");
+      return;
+    }
+    go((stageId + 1) as StageId);
   };
 
   const onBack = () => {
-    const prev = (stageId === 1 ? 7 : stageId - 1) as StageId;
-    go(prev);
+    if (celebrating) {
+      void playClick();
+      setCelebrating(false);
+      return;
+    }
+    if (stageId === 1) return;
+    go((stageId - 1) as StageId);
+  };
+
+  const onAgain = () => {
+    go(1);
   };
 
   useEffect(() => {
     return () => stop();
   }, [stop]);
 
+  const liveText = celebrating
+    ? "Rain again! You finished the rain story."
+    : `${stage.label}. ${stage.kidLine}`;
+
   return (
     <div
       className="dew-root"
       style={{ background: stage.moodBg }}
       data-stage={stageId}
+      data-celebrating={celebrating ? "1" : "0"}
     >
       <div className="dew-bg-blobs" aria-hidden>
         <span className="blob blob-a" />
         <span className="blob blob-b" />
         <span className="blob blob-c" />
+      </div>
+
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {liveText}
       </div>
 
       <header className="dew-header">
@@ -76,8 +105,20 @@ export default function DewApp() {
             style={{ background: stage.buttonBg, color: stage.buttonAccent }}
             aria-hidden
           >
-            {stage.label}
+            {celebrating ? "Yay!" : stage.label}
           </div>
+          {celebrating && (
+            <div className="celebrate-card" role="dialog" aria-label="Story finished">
+              <p className="celebrate-emoji" aria-hidden>
+                🌧️✨
+              </p>
+              <p className="celebrate-title">Rain again!</p>
+              <p className="celebrate-sub">You made it through the rain story.</p>
+              <button type="button" className="celebrate-again" onClick={onAgain}>
+                Again
+              </button>
+            </div>
+          )}
         </div>
 
         <StageButtons
@@ -85,12 +126,13 @@ export default function DewApp() {
           onSelect={go}
           onNext={onNext}
           onBack={onBack}
+          celebrating={celebrating}
           speakOn={speakOn}
           onToggleSpeak={() => {
             void playClick();
             setSpeakOn((v) => {
               const next = !v;
-              if (next) speak(stage.caption);
+              if (next) speak(celebrating ? "Rain again!" : stage.kidLine);
               else stop();
               return next;
             });
