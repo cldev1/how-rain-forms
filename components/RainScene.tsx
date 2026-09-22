@@ -681,7 +681,7 @@ function RainPuddle({ visual }: { visual: React.MutableRefObject<VisualState> })
     if (!show) return;
     const wet = Math.min(1, (rc - 80) / 160);
     const mat = mesh.current.material as THREE.MeshStandardMaterial;
-    mat.opacity = 0.35 + wet * 0.35;
+    mat.opacity = 0.55 + wet * 0.35;
     const pulse = 1 + Math.sin(clock.elapsedTime * 2.4) * 0.04;
     mesh.current.scale.set(pulse * (1 + wet * 0.25), 1, pulse * (1 + wet * 0.2));
     if (ripple.current) {
@@ -698,7 +698,7 @@ function RainPuddle({ visual }: { visual: React.MutableRefObject<VisualState> })
         <meshStandardMaterial
           color="#6EB8E0"
           transparent
-          opacity={0.45}
+          opacity={0.65}
           roughness={0.12}
           metalness={0.25}
           depthWrite={false}
