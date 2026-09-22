@@ -406,12 +406,12 @@ body {
   gap: 0.15rem;
   padding: 0;
   background: transparent;
-  min-width: 44px;
+  min-width: 56px;
 }
 
 .story-node-icon {
-  width: 52px;
-  height: 52px;
+  width: 58px;
+  height: 58px;
   border-radius: 18px;
   background: linear-gradient(180deg, #fff, var(--btn-bg));
   display: grid;
@@ -422,9 +422,9 @@ body {
 }
 
 .story-node.active .story-node-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 20px;
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
   transform: translateY(-4px);
   box-shadow: 0 0 0 3px #fff, 0 0 0 6px var(--btn-accent),
     0 8px 0 color-mix(in srgb, var(--btn-accent) 40%, transparent),

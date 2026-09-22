@@ -8,7 +8,7 @@ import { DewMood, StageConfig } from "./stageConfig";
 
 function CameraRig() {
   useFrame(({ camera }) => {
-    camera.lookAt(0, 0.35, 0);
+    camera.lookAt(-0.35, 0.15, 0.4);
   });
   return null;
 }
@@ -371,8 +371,8 @@ function Vapor({ visual }: { visual: React.MutableRefObject<VisualState> }) {
     }
     ref.current.geometry.attributes.position.needsUpdate = true;
     const mat = ref.current.material as THREE.PointsMaterial;
-    mat.opacity = 0.4 * intensity;
-    mat.size = 0.1 + intensity * 0.06;
+    mat.opacity = 0.55 * intensity;
+    mat.size = 0.18 + intensity * 0.14;
     ref.current.visible = intensity > 0.04;
   });
 
@@ -382,10 +382,10 @@ function Vapor({ visual }: { visual: React.MutableRefObject<VisualState> }) {
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
       <pointsMaterial
-        color="#D8F2FF"
-        size={0.12}
+        color="#FFF8E8"
+        size={0.22}
         transparent
-        opacity={0.35}
+        opacity={0.45}
         depthWrite={false}
         sizeAttenuation
       />
@@ -435,60 +435,60 @@ function Mist({ visual }: { visual: React.MutableRefObject<VisualState> }) {
 
 function RainStreaks({ visual }: { visual: React.MutableRefObject<VisualState> }) {
   const max = 360;
-  const ref = useRef<THREE.Points>(null);
-  const { positions, velocities } = useMemo(() => {
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const { positions, velocities, phases } = useMemo(() => {
     const positions = new Float32Array(max * 3);
     const velocities = new Float32Array(max);
+    const phases = new Float32Array(max);
     for (let i = 0; i < max; i++) {
       positions[i * 3] = (Math.random() - 0.5) * 11;
       positions[i * 3 + 1] = Math.random() * 8 - 1;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 7;
       velocities[i] = 0.75 + Math.random() * 0.5;
+      phases[i] = Math.random();
     }
-    return { positions, velocities };
+    return { positions, velocities, phases };
   }, []);
 
   useFrame((_, dt) => {
-    if (!ref.current) return;
+    if (!mesh.current) return;
     const v = visual.current;
     const count = Math.floor(v.rainCount);
     if (count < 1) {
-      ref.current.visible = false;
+      mesh.current.count = 0;
+      mesh.current.visible = false;
       return;
     }
-    ref.current.visible = true;
-    const pos = ref.current.geometry.attributes.position.array as Float32Array;
+    mesh.current.visible = true;
     const n = Math.min(count, max);
+    const len = 0.18 + v.rainSize * 4.5;
+    const thick = 0.012 + v.rainSize * 0.35;
     for (let i = 0; i < n; i++) {
-      pos[i * 3 + 1] -= v.rainSpeed * velocities[i] * dt;
-      pos[i * 3] += dt * 0.15;
-      if (pos[i * 3 + 1] < -2.15) {
-        pos[i * 3 + 1] = 4.2 + Math.random() * 2;
-        pos[i * 3] = (Math.random() - 0.5) * 11;
-        pos[i * 3 + 2] = (Math.random() - 0.5) * 7;
+      positions[i * 3 + 1] -= v.rainSpeed * velocities[i] * dt;
+      positions[i * 3] += dt * 0.12;
+      if (positions[i * 3 + 1] < -2.15) {
+        positions[i * 3 + 1] = 4.2 + Math.random() * 2;
+        positions[i * 3] = (Math.random() - 0.5) * 11;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 7;
       }
+      dummy.position.set(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
+      dummy.scale.set(thick, len, thick);
+      dummy.rotation.z = -0.18;
+      dummy.updateMatrix();
+      mesh.current.setMatrixAt(i, dummy.matrix);
     }
-    ref.current.geometry.attributes.position.needsUpdate = true;
-    ref.current.geometry.setDrawRange(0, n);
-    const mat = ref.current.material as THREE.PointsMaterial;
-    mat.size = v.rainSize * 1.15;
-    mat.opacity = 0.55 + Math.min(0.3, v.rainCount / 400);
+    mesh.current.count = n;
+    mesh.current.instanceMatrix.needsUpdate = true;
+    const mat = mesh.current.material as THREE.MeshBasicMaterial;
+    mat.opacity = 0.55 + Math.min(0.35, v.rainCount / 400);
   });
 
   return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        color="#A8D8FF"
-        size={0.05}
-        transparent
-        opacity={0.7}
-        depthWrite={false}
-        sizeAttenuation
-      />
-    </points>
+    <instancedMesh ref={mesh} args={[undefined, undefined, max]} frustumCulled={false}>
+      <boxGeometry args={[1, 1, 1]} />
+      <meshBasicMaterial color="#B8E4FF" transparent opacity={0.75} depthWrite={false} />
+    </instancedMesh>
   );
 }
 
@@ -702,7 +702,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
   });
 
   return (
-    <group ref={ref} position={[-2.6, -1.35, 2.4]} scale={1.15}>
+    <group ref={ref} position={[-1.15, -1.25, 2.55]} scale={1.35}>
       {/* body */}
       <mesh scale={[1, 1.3, 1]} castShadow>
         <sphereGeometry args={[0.42, 28, 28]} />
