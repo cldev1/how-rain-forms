@@ -409,11 +409,13 @@ function Mist({ visual }: { visual: React.MutableRefObject<VisualState> }) {
   useFrame(({ clock }) => {
     if (!ref.current) return;
     const m = visual.current.mist;
+    const raining = visual.current.rainCount > 8;
     const mat = ref.current.material as THREE.PointsMaterial;
-    mat.opacity = 0.12 + m * 0.42;
-    mat.size = 0.32 + m * 0.45;
+    // Hide square mist while raining so streaks stay readable
+    mat.opacity = raining ? 0 : 0.14 + m * 0.48;
+    mat.size = 0.36 + m * 0.5;
     ref.current.rotation.y = clock.elapsedTime * 0.02;
-    ref.current.visible = m > 0.05;
+    ref.current.visible = m > 0.05 && !raining;
   });
 
   return (
@@ -509,7 +511,7 @@ function Thermometer({ visible }: { visible: boolean }) {
   });
 
   return (
-    <group ref={group} position={[3.3, 0.15, 1.1]}>
+    <group ref={group} position={[2.15, 0.55, 1.6]}>
       <mesh>
         <capsuleGeometry args={[0.14, 1.35, 8, 16]} />
         <meshStandardMaterial color="#FFF8F0" roughness={0.4} />
@@ -668,7 +670,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
       bounce = Math.sin(t * 1.6) * 0.06;
     }
 
-    ref.current.position.y = -1.35 + bounce;
+    ref.current.position.y = -1.05 + bounce;
     ref.current.scale.set(squash, 2 - squash, squash);
     ref.current.rotation.z = Math.sin(t * 1.4) * (mood === "curious" ? 0.12 : 0.06);
     ref.current.rotation.y = Math.sin(t * 0.7) * 0.15;
@@ -702,7 +704,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
   });
 
   return (
-    <group ref={ref} position={[-1.15, -1.25, 2.55]} scale={1.35}>
+    <group ref={ref} position={[-1.05, -1.05, 2.7]} scale={1.4}>
       {/* body */}
       <mesh scale={[1, 1.3, 1]} castShadow>
         <sphereGeometry args={[0.42, 28, 28]} />
