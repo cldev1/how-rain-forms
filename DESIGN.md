@@ -63,5 +63,5 @@ All 7 stages tappable & **visually distinct on ~390×844** · polished kids look
 ## Shipped slices (2026-09-22)
 
 - **phone-trust:** viewport lock @390×844, lightning flash-gate, WebGL fallback, drizzle thickness, Dew framing.
-- **improve2:** Warm/Cool thermo + sky split + curious Dew; mid-stage silhouettes (drizzle mist rings, rain puddle shine, lots umbrella + wet grass); story-path fat-finger scroll-snap; end-of-story “Rain again!”; SoftCloud color reuse + phone rain soft-cap; speak kidLine + aria-live; dead CaptionBar/drei removed.
+- **improve2** (`3682e8c`): Warm/Cool thermo + sky split + curious Dew; mid-stage silhouettes (drizzle mist rings, rain puddle shine, lots umbrella + wet grass); story-path fat-finger scroll-snap; end-of-story “Rain again!”; SoftCloud color reuse + phone rain soft-cap; speak kidLine + aria-live; dead CaptionBar/drei removed.
 

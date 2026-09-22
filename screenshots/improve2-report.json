@@ -1,0 +1,131 @@
+{
+  "sha": "3682e8c",
+  "url": "https://how-rain-forms.vercel.app",
+  "viewport": "390x844",
+  "verified": {
+    "noPageScroll": true,
+    "celebrateFlow": true,
+    "pathHitTargetPx": {
+      "w": 80,
+      "h": 90,
+      "label": "Warm"
+    },
+    "stagesChecked": [
+      "1",
+      "2",
+      "4",
+      "5",
+      "6",
+      "7",
+      "celebrate",
+      "again"
+    ]
+  },
+  "stages": {
+    "1": {
+      "badge": "Clouds",
+      "kid": "Water goes up!",
+      "label": "Clouds",
+      "nextBtn": "Next\u203a",
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "celebrateVisible": false,
+      "canvasH": 538
+    },
+    "2": {
+      "badge": "Warm & Cool",
+      "kid": "Up high it cools.",
+      "label": "Warm & Cool",
+      "nextBtn": "Next\u203a",
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "celebrateVisible": false,
+      "canvasH": 538
+    },
+    "3": {
+      "badge": "Tiny Drops",
+      "kid": "Little drops form.",
+      "label": "Tiny Drops",
+      "nextBtn": "Next\u203a",
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "celebrateVisible": false,
+      "canvasH": 538
+    },
+    "4": {
+      "badge": "Drizzle",
+      "kid": "Soft drops fall.",
+      "label": "Drizzle",
+      "nextBtn": "Next\u203a",
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "celebrateVisible": false,
+      "canvasH": 538
+    },
+    "5": {
+      "badge": "Rain",
+      "kid": "Steady rain!",
+      "label": "Rain",
+      "nextBtn": "Next\u203a",
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "celebrateVisible": false,
+      "canvasH": 538
+    },
+    "6": {
+      "badge": "Lots of Rain",
+      "kid": "Big rain!",
+      "label": "Lots of Rain",
+      "nextBtn": "Next\u203a",
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "celebrateVisible": false,
+      "canvasH": 538
+    },
+    "7": {
+      "badge": "Storm Fun",
+      "kid": "Flash! Boom!",
+      "label": "Storm Fun",
+      "nextBtn": "Done\u203a",
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "celebrateVisible": false,
+      "canvasH": 538
+    },
+    "celebrate": {
+      "badge": "Yay!",
+      "kid": "Tap Again to play once more.",
+      "label": "Rain again!",
+      "nextBtn": "Again\u203a",
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "celebrateVisible": true,
+      "canvasH": 560
+    },
+    "again": {
+      "badge": "Clouds",
+      "kid": "Water goes up!",
+      "label": "Clouds",
+      "nextBtn": "Next\u203a",
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "celebrateVisible": false,
+      "canvasH": 538
+    }
+  },
+  "screenshots": [
+    "screenshots/improve2-01-clouds.png",
+    "screenshots/improve2-02-warm-cool.png",
+    "screenshots/improve2-04-drizzle.png",
+    "screenshots/improve2-05-rain.png",
+    "screenshots/improve2-06-lots.png",
+    "screenshots/improve2-07-storm.png",
+    "screenshots/improve2-08-again.png",
+    "screenshots/improve2-09-after-again.png",
+    "screenshots/improve2-scene-02.png",
+    "screenshots/improve2-scene-04.png",
+    "screenshots/improve2-scene-05.png",
+    "screenshots/improve2-scene-06.png",
+    "screenshots/improve2-scene-07.png"
+  ]
+}
