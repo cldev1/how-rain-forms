@@ -410,7 +410,8 @@ function Mist({ visual }: { visual: React.MutableRefObject<VisualState> }) {
     if (!ref.current) return;
     const m = visual.current.mist;
     const mat = ref.current.material as THREE.PointsMaterial;
-    mat.opacity = 0.08 + m * 0.18;
+    mat.opacity = 0.12 + m * 0.42;
+    mat.size = 0.32 + m * 0.45;
     ref.current.rotation.y = clock.elapsedTime * 0.02;
     ref.current.visible = m > 0.05;
   });
@@ -433,7 +434,7 @@ function Mist({ visual }: { visual: React.MutableRefObject<VisualState> }) {
 }
 
 function RainStreaks({ visual }: { visual: React.MutableRefObject<VisualState> }) {
-  const max = 300;
+  const max = 360;
   const ref = useRef<THREE.Points>(null);
   const { positions, velocities } = useMemo(() => {
     const positions = new Float32Array(max * 3);
@@ -835,7 +836,7 @@ export function SceneContent({
   }, [stage]);
 
   useFrame((_, dt) => {
-    const t = 1 - Math.exp(-dt * 2.4);
+    const t = 1 - Math.exp(-dt * 3.6);
     lerpVisual(visual.current, target.current, t);
     bg.current.copy(visual.current.skyBottom);
   });

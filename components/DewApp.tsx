@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useState } from "react";
 import RainCanvas from "./RainCanvas";
 import StageButtons from "./StageButtons";
-import CaptionBar from "./CaptionBar";
 import { STAGES, StageId, getStage } from "./stageConfig";
 import { useThunder } from "./useThunder";
 import { useNarrator } from "./useNarrator";
@@ -53,7 +52,11 @@ export default function DewApp() {
   }, [stop]);
 
   return (
-    <div className="dew-root">
+    <div
+      className="dew-root"
+      style={{ background: stage.moodBg }}
+      data-stage={stageId}
+    >
       <div className="dew-bg-blobs" aria-hidden>
         <span className="blob blob-a" />
         <span className="blob blob-b" />
@@ -65,7 +68,7 @@ export default function DewApp() {
           <DewLogo />
           <div>
             <h1 className="dew-title">Dew</h1>
-            <p className="dew-sub">How rain forms · tap a stage to explore</p>
+            <p className="dew-sub">How rain forms · tap Next to explore</p>
           </div>
         </div>
       </header>
@@ -74,10 +77,20 @@ export default function DewApp() {
         <div className="canvas-wrap">
           <RainCanvas stage={stage} flashTrigger={flashTrigger} />
           <div className="scene-glow" aria-hidden />
+          <div
+            className="scene-stage-badge"
+            style={{ background: stage.buttonBg, color: stage.buttonAccent }}
+            aria-hidden
+          >
+            {stage.label}
+          </div>
         </div>
 
-        <CaptionBar
-          stage={stage}
+        <StageButtons
+          current={stageId}
+          onSelect={go}
+          onNext={onNext}
+          onBack={onBack}
           speakOn={speakOn}
           onToggleSpeak={() => {
             void playClick();
@@ -89,17 +102,10 @@ export default function DewApp() {
             });
           }}
         />
-
-        <StageButtons
-          current={stageId}
-          onSelect={go}
-          onNext={onNext}
-          onBack={onBack}
-        />
       </main>
 
       <p className="dew-foot" aria-hidden>
-        Made for little explorers · {STAGES.length} magical stages
+        Made for little explorers · {STAGES.length} story stages
       </p>
     </div>
   );
@@ -109,8 +115,8 @@ function DewLogo() {
   return (
     <svg
       className="dew-logo-svg"
-      width="56"
-      height="64"
+      width="48"
+      height="56"
       viewBox="0 0 56 64"
       aria-hidden
     >
