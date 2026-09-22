@@ -8,7 +8,7 @@ import { DewMood, StageConfig } from "./stageConfig";
 
 function CameraRig() {
   useFrame(({ camera }) => {
-    camera.lookAt(-0.35, 0.15, 0.4);
+    camera.lookAt(-0.35, 0.35, 0.4);
   });
   return null;
 }
@@ -395,44 +395,54 @@ function Vapor({ visual }: { visual: React.MutableRefObject<VisualState> }) {
 }
 
 function Mist({ visual }: { visual: React.MutableRefObject<VisualState> }) {
-  const count = 50;
-  const ref = useRef<THREE.Points>(null);
-  const positions = useMemo(() => {
-    const p = new Float32Array(count * 3);
+  const count = 36;
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
+  const { positions, phases, scales } = useMemo(() => {
+    const positions = new Float32Array(count * 3);
+    const phases = new Float32Array(count);
+    const scales = new Float32Array(count);
     for (let i = 0; i < count; i++) {
-      p[i * 3] = (Math.random() - 0.5) * 12;
-      p[i * 3 + 1] = -1.6 + Math.random() * 1.4;
-      p[i * 3 + 2] = (Math.random() - 0.5) * 8;
+      positions[i * 3] = (Math.random() - 0.5) * 10;
+      positions[i * 3 + 1] = -1.4 + Math.random() * 1.6;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 6.5;
+      phases[i] = Math.random() * Math.PI * 2;
+      scales[i] = 0.12 + Math.random() * 0.22;
     }
-    return p;
+    return { positions, phases, scales };
   }, []);
 
   useFrame(({ clock }) => {
-    if (!ref.current) return;
+    if (!mesh.current) return;
     const m = visual.current.mist;
     const raining = visual.current.rainCount > 8;
-    const mat = ref.current.material as THREE.PointsMaterial;
-    // Hide square mist while raining so streaks stay readable
-    mat.opacity = raining ? 0 : 0.14 + m * 0.48;
-    mat.size = 0.36 + m * 0.5;
-    ref.current.rotation.y = clock.elapsedTime * 0.02;
-    ref.current.visible = m > 0.05 && !raining;
+    // Soft orbs only for Tiny Drops (no rain); lean on condensation beads
+    if (m < 0.05 || raining) {
+      mesh.current.visible = false;
+      mesh.current.count = 0;
+      return;
+    }
+    mesh.current.visible = true;
+    const t = clock.elapsedTime;
+    for (let i = 0; i < count; i++) {
+      const y = positions[i * 3 + 1] + Math.sin(t * 0.4 + phases[i]) * 0.06;
+      const s = scales[i] * (0.85 + m * 0.35);
+      dummy.position.set(positions[i * 3], y, positions[i * 3 + 2]);
+      dummy.scale.setScalar(s);
+      dummy.updateMatrix();
+      mesh.current.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.current.count = count;
+    mesh.current.instanceMatrix.needsUpdate = true;
+    const mat = mesh.current.material as THREE.MeshBasicMaterial;
+    mat.opacity = 0.18 + m * 0.32;
   });
 
   return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        color="#EAF4FF"
-        size={0.28}
-        transparent
-        opacity={0.2}
-        depthWrite={false}
-        sizeAttenuation
-      />
-    </points>
+    <instancedMesh ref={mesh} args={[undefined, undefined, count]} frustumCulled={false}>
+      <sphereGeometry args={[1, 12, 12]} />
+      <meshBasicMaterial color="#EAF4FF" transparent opacity={0.28} depthWrite={false} />
+    </instancedMesh>
   );
 }
 
@@ -603,6 +613,7 @@ function LightningFlash({
 }) {
   const light = useRef<THREE.PointLight>(null);
   const bolt = useRef<THREE.Mesh>(null);
+  const zigzag = useRef<THREE.Group>(null);
   const flashUntil = useRef(0);
 
   useEffect(() => {
@@ -619,6 +630,14 @@ function LightningFlash({
       const m = bolt.current.material as THREE.MeshBasicMaterial;
       m.opacity = on ? 0.95 : 0;
     }
+    if (zigzag.current) {
+      zigzag.current.visible = on;
+      zigzag.current.children.forEach((child) => {
+        const mesh = child as THREE.Mesh;
+        const mat = mesh.material as THREE.MeshBasicMaterial;
+        if (mat) mat.opacity = on ? 0.9 : 0;
+      });
+    }
   });
 
   if (!active) return null;
@@ -630,8 +649,8 @@ function LightningFlash({
         <boxGeometry args={[0.12, 1.6, 0.08]} />
         <meshBasicMaterial color="#FFF4A0" transparent opacity={0} />
       </mesh>
-      {/* zigzag friendly bolt via stacked boxes */}
-      <group position={[0.8, 2.6, 0.6]}>
+      {/* zigzag friendly bolt — only during flash beat */}
+      <group ref={zigzag} position={[0.8, 2.6, 0.6]} visible={false}>
         {[
           [0, 0.5, 0, 0.1, 0.55, -0.2],
           [-0.15, 0.05, 0, 0.1, 0.45, 0.15],
@@ -639,10 +658,56 @@ function LightningFlash({
         ].map(([x, y, z, sx, sy, rot], i) => (
           <mesh key={i} position={[x, y, z]} rotation={[0, 0, rot]}>
             <boxGeometry args={[sx, sy, 0.06]} />
-            <meshBasicMaterial color="#FFE566" transparent opacity={0.85} />
+            <meshBasicMaterial color="#FFE566" transparent opacity={0} />
           </mesh>
         ))}
       </group>
+    </group>
+  );
+}
+
+
+function RainPuddle({ visual }: { visual: React.MutableRefObject<VisualState> }) {
+  const mesh = useRef<THREE.Mesh>(null);
+  const ripple = useRef<THREE.Mesh>(null);
+
+  useFrame(({ clock }) => {
+    const rc = visual.current.rainCount;
+    // Light puddle silhouette on rain / lots-of-rain (stages 5–6)
+    const show = rc >= 80 && rc < 280;
+    if (!mesh.current) return;
+    mesh.current.visible = show;
+    if (ripple.current) ripple.current.visible = show;
+    if (!show) return;
+    const wet = Math.min(1, (rc - 80) / 160);
+    const mat = mesh.current.material as THREE.MeshStandardMaterial;
+    mat.opacity = 0.35 + wet * 0.35;
+    const pulse = 1 + Math.sin(clock.elapsedTime * 2.4) * 0.04;
+    mesh.current.scale.set(pulse * (1 + wet * 0.25), 1, pulse * (1 + wet * 0.2));
+    if (ripple.current) {
+      const rm = ripple.current.material as THREE.MeshBasicMaterial;
+      rm.opacity = 0.2 + wet * 0.25 + Math.sin(clock.elapsedTime * 3) * 0.05;
+      ripple.current.scale.setScalar(1.15 + wet * 0.35 + Math.sin(clock.elapsedTime * 2.2) * 0.06);
+    }
+  });
+
+  return (
+    <group position={[-0.4, -2.05, 2.1]}>
+      <mesh ref={mesh} rotation={[-Math.PI / 2, 0, 0.15]} visible={false}>
+        <circleGeometry args={[0.85, 32]} />
+        <meshStandardMaterial
+          color="#6EB8E0"
+          transparent
+          opacity={0.45}
+          roughness={0.12}
+          metalness={0.25}
+          depthWrite={false}
+        />
+      </mesh>
+      <mesh ref={ripple} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]} visible={false}>
+        <ringGeometry args={[0.55, 0.72, 28]} />
+        <meshBasicMaterial color="#A8D8F0" transparent opacity={0.25} depthWrite={false} />
+      </mesh>
     </group>
   );
 }
@@ -671,7 +736,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
       bounce = Math.sin(t * 1.6) * 0.06;
     }
 
-    ref.current.position.y = -1.05 + bounce;
+    ref.current.position.y = -0.62 + bounce;
     ref.current.scale.set(squash, 2 - squash, squash);
     ref.current.rotation.z = Math.sin(t * 1.4) * (mood === "curious" ? 0.12 : 0.06);
     ref.current.rotation.y = Math.sin(t * 0.7) * 0.15;
@@ -705,7 +770,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
   });
 
   return (
-    <group ref={ref} position={[-1.05, -1.05, 2.7]} scale={1.4}>
+    <group ref={ref} position={[-1.05, -0.62, 2.55]} scale={1.25}>
       {/* body */}
       <mesh scale={[1, 1.3, 1]} castShadow>
         <sphereGeometry args={[0.42, 28, 28]} />
@@ -864,6 +929,7 @@ export function SceneContent({
       <Vapor visual={visual} />
       <Mist visual={visual} />
       <RainStreaks visual={visual} />
+      <RainPuddle visual={visual} />
       <Thermometer visible={stage.showThermo} />
       <Condensation visible={stage.showCondensation} />
       <LightningFlash active={stage.showLightning} trigger={flashTrigger} />

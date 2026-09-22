@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import { StageConfig } from "./stageConfig";
+import { WebGLErrorBoundary } from "./WebGLFallback";
 
 const CanvasInner = dynamic(() => import("./RainCanvasInner"), {
   ssr: false,
@@ -20,5 +21,9 @@ export default function RainCanvas({
   stage: StageConfig;
   flashTrigger: number;
 }) {
-  return <CanvasInner stage={stage} flashTrigger={flashTrigger} />;
+  return (
+    <WebGLErrorBoundary stage={stage}>
+      <CanvasInner stage={stage} flashTrigger={flashTrigger} />
+    </WebGLErrorBoundary>
+  );
 }

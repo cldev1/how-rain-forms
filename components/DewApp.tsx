@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import RainCanvas from "./RainCanvas";
 import StageButtons from "./StageButtons";
-import { STAGES, StageId, getStage } from "./stageConfig";
+import { StageId, getStage } from "./stageConfig";
 import { useThunder } from "./useThunder";
 import { useNarrator } from "./useNarrator";
 import { useClickSound } from "./useClickSound";
@@ -40,12 +40,6 @@ export default function DewApp() {
     const prev = (stageId === 1 ? 7 : stageId - 1) as StageId;
     go(prev);
   };
-
-  useEffect(() => {
-    if (stageId !== 7) return;
-    const t = setTimeout(() => go(1), 50000);
-    return () => clearTimeout(t);
-  }, [stageId, go]);
 
   useEffect(() => {
     return () => stop();
@@ -103,10 +97,6 @@ export default function DewApp() {
           }}
         />
       </main>
-
-      <p className="dew-foot" aria-hidden>
-        Made for little explorers · {STAGES.length} story stages
-      </p>
     </div>
   );
 }
@@ -115,8 +105,8 @@ function DewLogo() {
   return (
     <svg
       className="dew-logo-svg"
-      width="48"
-      height="56"
+      width="40"
+      height="48"
       viewBox="0 0 56 64"
       aria-hidden
     >
