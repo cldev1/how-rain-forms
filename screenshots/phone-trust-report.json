@@ -1,162 +1,65 @@
 {
-  "url": "https://how-rain-forms.vercel.app",
-  "viewport": {
-    "width": 390,
-    "height": 844
-  },
+  "shaHint": "24b54bd",
   "stages": {
     "1": {
-      "htmlScrollH": 844,
-      "htmlClientH": 844,
-      "bodyScrollH": 844,
-      "bodyClientH": 844,
-      "rootScrollH": 844,
-      "rootClientH": 844,
-      "rootOverflow": "hidden",
-      "bodyOverflowY": "hidden",
-      "htmlOverflowY": "hidden",
       "pageScrollable": false,
-      "canvasBox": {
-        "w": 372,
-        "h": 552,
-        "top": 48,
-        "bottom": 599
-      },
-      "sheetBox": {
-        "w": 372,
-        "h": 232,
-        "top": 606,
-        "bottom": 838
-      },
-      "navH": 52,
-      "hasFallback": true,
+      "rootOverflow": "hidden",
+      "lockedScroll": true,
+      "hasFallbackVisible": false,
       "hasCanvas": true,
-      "stageBadge": "Clouds",
-      "kidLine": "Water goes up!"
+      "canvasH": 551,
+      "sheetH": 231,
+      "navH": 52,
+      "badge": "Clouds",
+      "kid": "Water goes up!"
     },
     "3": {
-      "htmlScrollH": 844,
-      "htmlClientH": 844,
-      "bodyScrollH": 844,
-      "bodyClientH": 844,
-      "rootScrollH": 844,
-      "rootClientH": 844,
-      "rootOverflow": "hidden",
-      "bodyOverflowY": "hidden",
-      "htmlOverflowY": "hidden",
       "pageScrollable": false,
-      "canvasBox": {
-        "w": 372,
-        "h": 552,
-        "top": 48,
-        "bottom": 599
-      },
-      "sheetBox": {
-        "w": 372,
-        "h": 232,
-        "top": 606,
-        "bottom": 838
-      },
-      "navH": 52,
-      "hasFallback": true,
+      "rootOverflow": "hidden",
+      "lockedScroll": true,
+      "hasFallbackVisible": false,
       "hasCanvas": true,
-      "stageBadge": "Tiny Drops",
-      "kidLine": "Little drops form."
+      "canvasH": 551,
+      "sheetH": 231,
+      "navH": 52,
+      "badge": "Tiny Drops",
+      "kid": "Little drops form."
     },
     "4": {
-      "htmlScrollH": 844,
-      "htmlClientH": 844,
-      "bodyScrollH": 844,
-      "bodyClientH": 844,
-      "rootScrollH": 844,
-      "rootClientH": 844,
-      "rootOverflow": "hidden",
-      "bodyOverflowY": "hidden",
-      "htmlOverflowY": "hidden",
       "pageScrollable": false,
-      "canvasBox": {
-        "w": 372,
-        "h": 552,
-        "top": 48,
-        "bottom": 599
-      },
-      "sheetBox": {
-        "w": 372,
-        "h": 232,
-        "top": 606,
-        "bottom": 838
-      },
-      "navH": 52,
-      "hasFallback": true,
+      "rootOverflow": "hidden",
+      "lockedScroll": true,
+      "hasFallbackVisible": false,
       "hasCanvas": true,
-      "stageBadge": "Drizzle",
-      "kidLine": "Soft drops fall."
+      "canvasH": 551,
+      "sheetH": 231,
+      "navH": 52,
+      "badge": "Drizzle",
+      "kid": "Soft drops fall."
     },
     "5": {
-      "htmlScrollH": 844,
-      "htmlClientH": 844,
-      "bodyScrollH": 844,
-      "bodyClientH": 844,
-      "rootScrollH": 844,
-      "rootClientH": 844,
-      "rootOverflow": "hidden",
-      "bodyOverflowY": "hidden",
-      "htmlOverflowY": "hidden",
       "pageScrollable": false,
-      "canvasBox": {
-        "w": 372,
-        "h": 552,
-        "top": 48,
-        "bottom": 599
-      },
-      "sheetBox": {
-        "w": 372,
-        "h": 232,
-        "top": 606,
-        "bottom": 838
-      },
-      "navH": 52,
-      "hasFallback": true,
+      "rootOverflow": "hidden",
+      "lockedScroll": true,
+      "hasFallbackVisible": false,
       "hasCanvas": true,
-      "stageBadge": "Rain",
-      "kidLine": "Steady rain!"
+      "canvasH": 551,
+      "sheetH": 231,
+      "navH": 52,
+      "badge": "Rain",
+      "kid": "Steady rain!"
     },
     "7": {
-      "htmlScrollH": 844,
-      "htmlClientH": 844,
-      "bodyScrollH": 844,
-      "bodyClientH": 844,
-      "rootScrollH": 844,
-      "rootClientH": 844,
-      "rootOverflow": "hidden",
-      "bodyOverflowY": "hidden",
-      "htmlOverflowY": "hidden",
       "pageScrollable": false,
-      "canvasBox": {
-        "w": 372,
-        "h": 552,
-        "top": 48,
-        "bottom": 599
-      },
-      "sheetBox": {
-        "w": 372,
-        "h": 232,
-        "top": 606,
-        "bottom": 838
-      },
-      "navH": 52,
-      "hasFallback": true,
+      "rootOverflow": "hidden",
+      "lockedScroll": true,
+      "hasFallbackVisible": false,
       "hasCanvas": true,
-      "stageBadge": "Storm Fun",
-      "kidLine": "Flash! Boom!"
+      "canvasH": 551,
+      "sheetH": 231,
+      "navH": 52,
+      "badge": "Storm Fun",
+      "kid": "Flash! Boom!"
     }
-  },
-  "consoleErrors": [],
-  "scrollCheck": {
-    "before": 0,
-    "after": 0,
-    "rootBefore": 0,
-    "rootAfter": 0,
-    "locked": true
   }
 }
