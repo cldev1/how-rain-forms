@@ -1,0 +1,54 @@
+{
+  "url": "https://how-rain-forms.vercel.app",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "stages": [
+    {
+      "id": 1,
+      "file": "mobile-stage-01.png",
+      "hero": "Clouds",
+      "kid": "Water goes up!"
+    },
+    {
+      "id": 2,
+      "file": "mobile-stage-02.png",
+      "hero": "Warm & Cool",
+      "kid": "Up high it cools."
+    },
+    {
+      "id": 3,
+      "file": "mobile-stage-03.png",
+      "hero": "Tiny Drops",
+      "kid": "Little drops form."
+    },
+    {
+      "id": 4,
+      "file": "mobile-stage-04.png",
+      "hero": "Drizzle",
+      "kid": "Soft drops fall."
+    },
+    {
+      "id": 5,
+      "file": "mobile-stage-05.png",
+      "hero": "Rain",
+      "kid": "Steady rain!"
+    },
+    {
+      "id": 6,
+      "file": "mobile-stage-06.png",
+      "hero": "Lots of Rain",
+      "kid": "Big rain!"
+    },
+    {
+      "id": 7,
+      "file": "mobile-stage-07.png",
+      "hero": "Storm Fun",
+      "kid": "Flash! Boom!"
+    }
+  ],
+  "errors": [],
+  "hasApplicationError": false,
+  "errorCount": 0
+}
