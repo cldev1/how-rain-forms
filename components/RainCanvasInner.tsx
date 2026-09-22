@@ -31,7 +31,7 @@ export default function RainCanvasInner({
   return (
     <Canvas
       key={retryKey}
-      camera={{ position: [0.2, 1.55, 7.6], fov: 40 }}
+      camera={{ position: [0.15, 1.75, 7.9], fov: 38 }}
       dpr={[1, 1.75]}
       gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
       style={{ width: "100%", height: "100%", touchAction: "none" }}

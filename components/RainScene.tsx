@@ -8,7 +8,7 @@ import { DewMood, StageConfig } from "./stageConfig";
 
 function CameraRig() {
   useFrame(({ camera }) => {
-    camera.lookAt(-0.35, 0.35, 0.4);
+    camera.lookAt(-0.35, 0.55, 0.35);
   });
   return null;
 }
@@ -736,7 +736,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
       bounce = Math.sin(t * 1.6) * 0.06;
     }
 
-    ref.current.position.y = -0.62 + bounce;
+    ref.current.position.y = -0.28 + bounce;
     ref.current.scale.set(squash, 2 - squash, squash);
     ref.current.rotation.z = Math.sin(t * 1.4) * (mood === "curious" ? 0.12 : 0.06);
     ref.current.rotation.y = Math.sin(t * 0.7) * 0.15;
@@ -770,7 +770,7 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
   });
 
   return (
-    <group ref={ref} position={[-1.05, -0.62, 2.55]} scale={1.25}>
+    <group ref={ref} position={[-1.05, -0.28, 2.4]} scale={1.15}>
       {/* body */}
       <mesh scale={[1, 1.3, 1]} castShadow>
         <sphereGeometry args={[0.42, 28, 28]} />
