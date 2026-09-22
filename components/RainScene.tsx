@@ -54,20 +54,31 @@ function lerpVisual(cur: VisualState, target: VisualState, t: number) {
   cur.rainSize += (target.rainSize - cur.rainSize) * t;
 }
 
-function SkyBackdrop({ visual }: { visual: React.MutableRefObject<VisualState> }) {
+function SkyBackdrop({
+  visual,
+  warmCool,
+}: {
+  visual: React.MutableRefObject<VisualState>;
+  warmCool: boolean;
+}) {
   const matRef = useRef<THREE.ShaderMaterial>(null);
   const uniforms = useMemo(
     () => ({
       topColor: { value: new THREE.Color("#9ED4FF") },
       bottomColor: { value: new THREE.Color("#F2F9FF") },
+      warmColor: { value: new THREE.Color("#FF9A40") },
+      coolColor: { value: new THREE.Color("#5AA8FF") },
+      splitAmt: { value: 0 },
     }),
     []
   );
 
-  useFrame(() => {
+  useFrame((_, dt) => {
     if (!matRef.current) return;
     uniforms.topColor.value.copy(visual.current.skyTop);
     uniforms.bottomColor.value.copy(visual.current.skyBottom);
+    const target = warmCool ? 1 : 0;
+    uniforms.splitAmt.value += (target - uniforms.splitAmt.value) * Math.min(1, dt * 4);
   });
 
   return (
@@ -86,9 +97,21 @@ function SkyBackdrop({ visual }: { visual: React.MutableRefObject<VisualState> }
         fragmentShader={`
           uniform vec3 topColor;
           uniform vec3 bottomColor;
+          uniform vec3 warmColor;
+          uniform vec3 coolColor;
+          uniform float splitAmt;
           varying vec2 vUv;
           void main() {
-            vec3 col = mix(bottomColor, topColor, smoothstep(0.0, 1.0, vUv.y));
+            vec3 vert = mix(bottomColor, topColor, smoothstep(0.0, 1.0, vUv.y));
+            vec3 horiz = mix(warmColor, coolColor, smoothstep(0.28, 0.72, vUv.x));
+            // warm bottom-left / cool top-right pedagogical read
+            vec3 splitCol = mix(
+              mix(warmColor, bottomColor, 0.25),
+              mix(coolColor, topColor, 0.2),
+              smoothstep(0.32, 0.68, vUv.x)
+            );
+            splitCol = mix(splitCol, horiz, 0.35);
+            vec3 col = mix(vert, splitCol, splitAmt);
             gl_FragColor = vec4(col, 1.0);
           }
         `}
@@ -158,14 +181,14 @@ function Terrain({ visual }: { visual: React.MutableRefObject<VisualState> }) {
     const rc = visual.current.rainCount;
     const wetAmt = Math.min(1, rc / 200);
     // Lots of Rain: darker wet-grass jump (silhouette beyond density)
-    if (rc >= 180) {
-      tmp.copy(wet).lerp(heavyWet, Math.min(1, (rc - 180) / 80));
+    if (rc >= 160) {
+      tmp.copy(wet).lerp(heavyWet, Math.min(1, (rc - 160) / 80));
     } else {
       tmp.copy(dry).lerp(wet, wetAmt);
     }
     if (grass.current) {
       grass.current.color.copy(tmp);
-      grass.current.roughness = 0.92 - wetAmt * 0.45 - (rc >= 180 ? 0.12 : 0);
+      grass.current.roughness = 0.92 - wetAmt * 0.45 - (rc >= 160 ? 0.12 : 0);
     }
     if (pond.current) {
       pond.current.opacity = 0.35 + wetAmt * 0.5;
@@ -536,7 +559,7 @@ function Thermometer({ visible }: { visible: boolean }) {
   });
 
   return (
-    <group ref={group} position={[1.55, 0.35, 3.15]} scale={1.35}>
+    <group ref={group} position={[1.35, 0.15, 3.55]} scale={1.55}>
       <mesh>
         <capsuleGeometry args={[0.16, 1.45, 8, 16]} />
         <meshStandardMaterial color="#FFF8F0" roughness={0.35} />
@@ -700,7 +723,7 @@ function DrizzleMistRings({ visual }: { visual: React.MutableRefObject<VisualSta
       if (!ring) return;
       const mat = ring.material as THREE.MeshBasicMaterial;
       const pulse = (Math.sin(t * 1.6 + i * 1.1) + 1) / 2;
-      mat.opacity = 0.18 + pulse * 0.22;
+      mat.opacity = 0.32 + pulse * 0.28;
       const s = 0.85 + i * 0.35 + pulse * 0.12;
       ring.scale.set(s, s, 1);
     });
@@ -718,13 +741,13 @@ function DrizzleMistRings({ visual }: { visual: React.MutableRefObject<VisualSta
           position={[i * 0.15 - 0.1, 0.02 * i, i * -0.1]}
         >
           <ringGeometry args={[0.35 + i * 0.15, 0.55 + i * 0.18, 28]} />
-          <meshBasicMaterial color="#D0E8F8" transparent opacity={0.25} depthWrite={false} />
+          <meshBasicMaterial color="#C0E0F8" transparent opacity={0.4} depthWrite={false} />
         </mesh>
       ))}
       {/* soft wet ground sheen for drizzle */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0.1, 0, 0.2]}>
         <circleGeometry args={[0.7, 24]} />
-        <meshBasicMaterial color="#B8DCF0" transparent opacity={0.22} depthWrite={false} />
+        <meshBasicMaterial color="#A8D4F0" transparent opacity={0.38} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -744,20 +767,20 @@ function RainPuddle({ visual }: { visual: React.MutableRefObject<VisualState> })
     if (!mesh.current) return;
     mesh.current.visible = show;
     if (ripple.current) ripple.current.visible = show;
-    if (ripple2.current) ripple2.current.visible = show && rc >= 180;
+    if (ripple2.current) ripple2.current.visible = show && rc >= 160;
     if (shine.current) shine.current.visible = show && rc >= 100;
     if (!show) return;
-    const lots = rc >= 180;
+    const lots = rc >= 160;
     const wet = Math.min(1, (rc - 90) / 150);
     const mat = mesh.current.material as THREE.MeshStandardMaterial;
-    mat.opacity = 0.62 + wet * 0.3;
+    mat.opacity = 0.72 + wet * 0.25;
     mat.metalness = 0.28 + wet * 0.2;
     const base = lots ? 1.55 : 1.05;
     const pulse = 1 + Math.sin(clock.elapsedTime * 2.6) * 0.035;
     mesh.current.scale.set(pulse * base, 1, pulse * base * 0.9);
     if (ripple.current) {
       const rm = ripple.current.material as THREE.MeshBasicMaterial;
-      rm.opacity = 0.28 + wet * 0.3 + Math.sin(clock.elapsedTime * 3.2) * 0.06;
+      rm.opacity = 0.4 + wet * 0.35 + Math.sin(clock.elapsedTime * 3.2) * 0.08;
       ripple.current.scale.setScalar(1.05 + wet * 0.4 + Math.sin(clock.elapsedTime * 2.4) * 0.08);
     }
     if (ripple2.current) {
@@ -806,16 +829,16 @@ function RainUmbrella({ visual }: { visual: React.MutableRefObject<VisualState> 
 
   useFrame(({ clock }) => {
     const rc = visual.current.rainCount;
-    const show = rc >= 180 && rc < 300;
+    const show = rc >= 160 && rc < 300;
     if (!group.current) return;
     group.current.visible = show;
     if (!show) return;
     group.current.rotation.z = Math.sin(clock.elapsedTime * 1.8) * 0.06;
-    group.current.position.y = -0.55 + Math.sin(clock.elapsedTime * 2.2) * 0.03;
+    group.current.position.y = -0.35 + Math.sin(clock.elapsedTime * 2.2) * 0.03;
   });
 
   return (
-    <group ref={group} position={[2.05, -0.55, 2.55]} visible={false} scale={0.95}>
+    <group ref={group} position={[1.15, -0.35, 2.85]} visible={false} scale={1.15}>
       {/* pole */}
       <mesh position={[0, -0.55, 0]}>
         <cylinderGeometry args={[0.035, 0.04, 1.1, 8]} />
@@ -859,28 +882,28 @@ function WarmCoolSplit({ active }: { active: boolean }) {
 
   return (
     <group ref={group} visible={false}>
-      {/* warm left wash */}
-      <mesh position={[-4.2, 2.4, -12]} scale={[10, 14, 1]}>
+      {/* warm left wash — strong pedagogy read */}
+      <mesh position={[-5.5, 2.8, -10]} scale={[14, 16, 1]}>
         <planeGeometry />
-        <meshBasicMaterial color="#FFB060" transparent opacity={0.42} depthWrite={false} />
+        <meshBasicMaterial color="#FF9A40" transparent opacity={0.55} depthWrite={false} />
       </mesh>
-      <mesh position={[-2.2, 1.2, -11.5]} scale={[5, 8, 1]}>
+      <mesh position={[-3.2, 1.0, -8]} scale={[7, 10, 1]}>
         <planeGeometry />
-        <meshBasicMaterial color="#FFE090" transparent opacity={0.28} depthWrite={false} />
+        <meshBasicMaterial color="#FFE066" transparent opacity={0.4} depthWrite={false} />
       </mesh>
       {/* cool right wash */}
-      <mesh position={[4.2, 2.6, -12]} scale={[10, 14, 1]}>
+      <mesh position={[5.5, 3.0, -10]} scale={[14, 16, 1]}>
         <planeGeometry />
-        <meshBasicMaterial color="#78B8FF" transparent opacity={0.45} depthWrite={false} />
+        <meshBasicMaterial color="#5AA8FF" transparent opacity={0.55} depthWrite={false} />
       </mesh>
-      <mesh position={[2.4, 3.2, -11.5]} scale={[5, 7, 1]}>
+      <mesh position={[3.2, 3.6, -8]} scale={[7, 9, 1]}>
         <planeGeometry />
-        <meshBasicMaterial color="#A8D4FF" transparent opacity={0.3} depthWrite={false} />
+        <meshBasicMaterial color="#A0D0FF" transparent opacity={0.38} depthWrite={false} />
       </mesh>
       {/* soft divider glow */}
-      <mesh position={[0.15, 2.2, -11]} scale={[1.2, 12, 1]}>
+      <mesh position={[0.1, 2.4, -7.5]} scale={[1.6, 14, 1]}>
         <planeGeometry />
-        <meshBasicMaterial color="#FFF8E8" transparent opacity={0.22} depthWrite={false} />
+        <meshBasicMaterial color="#FFF8E8" transparent opacity={0.35} depthWrite={false} />
       </mesh>
     </group>
   );
@@ -1025,9 +1048,9 @@ function DewMascot3D({ mood }: { mood: DewMood }) {
         </mesh>
       </group>
 
-      {/* smile — curved up */}
-      <mesh position={[0, -0.08, 0.39]} rotation={[Math.PI, 0, Math.PI]}>
-        <torusGeometry args={[0.1, 0.022, 8, 20, Math.PI]} />
+      {/* smile — curved up (half-torus opening downward = happy) */}
+      <mesh position={[0, -0.12, 0.39]} rotation={[0, 0, Math.PI]}>
+        <torusGeometry args={[0.09, 0.024, 8, 20, Math.PI]} />
         <meshStandardMaterial color="#243850" />
       </mesh>
 
@@ -1100,7 +1123,7 @@ export function SceneContent({
       <hemisphereLight args={["#EAF5FF", "#8FD98A", 0.55]} />
       <directionalLight position={[5, 9, 4]} intensity={0.75} color="#FFF6E8" />
 
-      <SkyBackdrop visual={visual} />
+      <SkyBackdrop visual={visual} warmCool={stage.showThermo} />
       <WarmCoolSplit active={stage.showThermo} />
       <Sun visual={visual} />
       <Terrain visual={visual} />
