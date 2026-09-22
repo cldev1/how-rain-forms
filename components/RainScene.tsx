@@ -559,7 +559,7 @@ function Thermometer({ visible }: { visible: boolean }) {
   });
 
   return (
-    <group ref={group} position={[1.35, 0.15, 3.55]} scale={1.55}>
+    <group ref={group} position={[1.05, 0.85, 2.9]} scale={1.25}>
       <mesh>
         <capsuleGeometry args={[0.16, 1.45, 8, 16]} />
         <meshStandardMaterial color="#FFF8F0" roughness={0.35} />
@@ -838,31 +838,36 @@ function RainUmbrella({ visual }: { visual: React.MutableRefObject<VisualState> 
   });
 
   return (
-    <group ref={group} position={[1.15, -0.35, 2.85]} visible={false} scale={1.15}>
+    <group ref={group} position={[1.25, -0.15, 2.7]} visible={false} scale={1.2}>
       {/* pole */}
-      <mesh position={[0, -0.55, 0]}>
-        <cylinderGeometry args={[0.035, 0.04, 1.1, 8]} />
+      <mesh position={[0, -0.35, 0]}>
+        <cylinderGeometry args={[0.04, 0.045, 1.2, 8]} />
         <meshStandardMaterial color="#8B6914" />
       </mesh>
-      {/* canopy */}
-      <mesh position={[0, 0.05, 0]} rotation={[Math.PI, 0, 0]}>
-        <coneGeometry args={[0.72, 0.42, 12]} />
+      {/* canopy — tip up so it reads as umbrella, not flat disc */}
+      <mesh position={[0, 0.35, 0]}>
+        <coneGeometry args={[0.78, 0.5, 14]} />
         <meshStandardMaterial
           color="#FF8AB0"
-          roughness={0.45}
+          roughness={0.4}
           emissive="#FF6090"
-          emissiveIntensity={0.15}
+          emissiveIntensity={0.22}
         />
       </mesh>
-      <mesh position={[0, 0.12, 0]}>
-        <sphereGeometry args={[0.08, 10, 10]} />
-        <meshStandardMaterial color="#FFE566" />
+      {/* underside bowl for thickness */}
+      <mesh position={[0, 0.22, 0]} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.72, 0.22, 14]} />
+        <meshStandardMaterial color="#FF70A0" roughness={0.5} />
       </mesh>
-      {/* little splash dots under rim */}
-      {[-0.35, 0, 0.35].map((x, i) => (
-        <mesh key={i} position={[x, -0.95, 0.15]}>
-          <sphereGeometry args={[0.05, 8, 8]} />
-          <meshBasicMaterial color="#A0D8FF" transparent opacity={0.7} />
+      <mesh position={[0, 0.58, 0]}>
+        <sphereGeometry args={[0.09, 10, 10]} />
+        <meshStandardMaterial color="#FFE566" emissive="#FFD040" emissiveIntensity={0.3} />
+      </mesh>
+      {/* splash dots */}
+      {[-0.4, 0, 0.4].map((x, i) => (
+        <mesh key={i} position={[x, -0.85, 0.2]}>
+          <sphereGeometry args={[0.055, 8, 8]} />
+          <meshBasicMaterial color="#A0D8FF" transparent opacity={0.75} />
         </mesh>
       ))}
     </group>
