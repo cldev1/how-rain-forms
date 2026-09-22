@@ -339,57 +339,58 @@ function SoftCloud({
 }
 
 function Vapor({ visual }: { visual: React.MutableRefObject<VisualState> }) {
-  const count = 90;
-  const ref = useRef<THREE.Points>(null);
+  const count = 48;
+  const mesh = useRef<THREE.InstancedMesh>(null);
+  const dummy = useMemo(() => new THREE.Object3D(), []);
   const { positions, speeds, phases } = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const speeds = new Float32Array(count);
     const phases = new Float32Array(count);
     for (let i = 0; i < count; i++) {
-      positions[i * 3] = (Math.random() - 0.5) * 3.2;
+      positions[i * 3] = (Math.random() - 0.5) * 2.6;
       positions[i * 3 + 1] = -2 + Math.random() * 2.2;
-      positions[i * 3 + 2] = (Math.random() - 0.5) * 2.2;
-      speeds[i] = 0.35 + Math.random() * 0.55;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 1.8;
+      speeds[i] = 0.4 + Math.random() * 0.55;
       phases[i] = Math.random() * Math.PI * 2;
     }
     return { positions, speeds, phases };
   }, []);
 
   useFrame(({ clock }, dt) => {
-    if (!ref.current) return;
+    if (!mesh.current) return;
     const intensity = visual.current.vapor;
-    const pos = ref.current.geometry.attributes.position.array as Float32Array;
-    const t = clock.elapsedTime;
-    for (let i = 0; i < count; i++) {
-      if (intensity < 0.04) continue;
-      pos[i * 3 + 1] += speeds[i] * dt * Math.max(0.15, intensity);
-      pos[i * 3] += Math.sin(t * 1.2 + phases[i]) * 0.004;
-      if (pos[i * 3 + 1] > 2.6) {
-        pos[i * 3 + 1] = -2.05;
-        pos[i * 3] = (Math.random() - 0.5) * 3.2;
-      }
+    if (intensity < 0.04) {
+      mesh.current.visible = false;
+      mesh.current.count = 0;
+      return;
     }
-    ref.current.geometry.attributes.position.needsUpdate = true;
-    const mat = ref.current.material as THREE.PointsMaterial;
-    mat.opacity = 0.55 * intensity;
-    mat.size = 0.18 + intensity * 0.14;
-    ref.current.visible = intensity > 0.04;
+    mesh.current.visible = true;
+    const t = clock.elapsedTime;
+    const n = count;
+    for (let i = 0; i < n; i++) {
+      positions[i * 3 + 1] += speeds[i] * dt * Math.max(0.2, intensity);
+      positions[i * 3] += Math.sin(t * 1.2 + phases[i]) * 0.004;
+      if (positions[i * 3 + 1] > 2.4) {
+        positions[i * 3 + 1] = -2.05;
+        positions[i * 3] = (Math.random() - 0.5) * 2.6;
+      }
+      const s = (0.06 + intensity * 0.08) * (0.7 + (i % 3) * 0.15);
+      dummy.position.set(positions[i * 3], positions[i * 3 + 1], positions[i * 3 + 2]);
+      dummy.scale.setScalar(s);
+      dummy.updateMatrix();
+      mesh.current.setMatrixAt(i, dummy.matrix);
+    }
+    mesh.current.count = n;
+    mesh.current.instanceMatrix.needsUpdate = true;
+    const mat = mesh.current.material as THREE.MeshBasicMaterial;
+    mat.opacity = 0.25 + intensity * 0.35;
   });
 
   return (
-    <points ref={ref}>
-      <bufferGeometry>
-        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
-      </bufferGeometry>
-      <pointsMaterial
-        color="#FFF8E8"
-        size={0.22}
-        transparent
-        opacity={0.45}
-        depthWrite={false}
-        sizeAttenuation
-      />
-    </points>
+    <instancedMesh ref={mesh} args={[undefined, undefined, count]} frustumCulled={false}>
+      <sphereGeometry args={[1, 10, 10]} />
+      <meshBasicMaterial color="#FFF4D0" transparent opacity={0.4} depthWrite={false} />
+    </instancedMesh>
   );
 }
 
