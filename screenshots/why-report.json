@@ -1,0 +1,176 @@
+{
+  "sha": "9b533e8",
+  "url": "https://how-rain-forms.vercel.app",
+  "viewport": "390x844",
+  "verified": {
+    "noPageScroll": true,
+    "everyStageHasWhy": true,
+    "everyStageHasWarmthHumidity": true,
+    "celebrateFlow": true,
+    "stagesChecked": [
+      "1",
+      "2",
+      "3",
+      "5",
+      "7",
+      "celebrate",
+      "again"
+    ]
+  },
+  "stages": {
+    "1": {
+      "badge": "Clouds",
+      "label": "Clouds",
+      "kid": "Water goes up!",
+      "why": "Warm water leaves the puddle and floats up as tiny invisible drops.",
+      "whyVisible": true,
+      "warmth": "warm28°",
+      "humidity": "air filling",
+      "cuesCount": 2,
+      "cuesVisible": true,
+      "celebrateVisible": false,
+      "canvasH": 453,
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "viewport": {
+        "w": 390,
+        "h": 844
+      },
+      "rootH": 844
+    },
+    "2": {
+      "badge": "Warm & Cool",
+      "label": "Warm & Cool",
+      "kid": "Up high it cools.",
+      "why": "High up the air is colder, so the tiny drops slow down.",
+      "whyVisible": true,
+      "warmth": "cooler10°",
+      "humidity": "air filling",
+      "cuesCount": 2,
+      "cuesVisible": true,
+      "celebrateVisible": false,
+      "canvasH": 453,
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "viewport": {
+        "w": 390,
+        "h": 844
+      },
+      "rootH": 844
+    },
+    "3": {
+      "badge": "Tiny Drops",
+      "label": "Tiny Drops",
+      "kid": "Little drops form.",
+      "why": "Cold air squeezes the drops together into a soft cloud.",
+      "whyVisible": true,
+      "warmth": "cold5°",
+      "humidity": "cloud soft",
+      "cuesCount": 2,
+      "cuesVisible": true,
+      "celebrateVisible": false,
+      "canvasH": 453,
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "viewport": {
+        "w": 390,
+        "h": 844
+      },
+      "rootH": 844
+    },
+    "5": {
+      "badge": "Rain",
+      "label": "Rain",
+      "kid": "Steady rain!",
+      "why": "The cloud is too heavy, so water falls down as rain.",
+      "whyVisible": true,
+      "warmth": "cold4°",
+      "humidity": "cloud full",
+      "cuesCount": 2,
+      "cuesVisible": true,
+      "celebrateVisible": false,
+      "canvasH": 467,
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "viewport": {
+        "w": 390,
+        "h": 844
+      },
+      "rootH": 844
+    },
+    "7": {
+      "badge": "Storm Fun",
+      "label": "Storm Fun",
+      "kid": "Flash! Boom!",
+      "why": "The heavy cloud rumbles and flashes while rain pours down.",
+      "whyVisible": true,
+      "warmth": "cold3°",
+      "humidity": "cloud full",
+      "cuesCount": 2,
+      "cuesVisible": true,
+      "celebrateVisible": false,
+      "canvasH": 453,
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "viewport": {
+        "w": 390,
+        "h": 844
+      },
+      "rootH": 844
+    },
+    "celebrate": {
+      "badge": "Yay!",
+      "label": "Rain again!",
+      "kid": "Tap Again to play once more.",
+      "why": "You finished the rain story — start again anytime.",
+      "whyVisible": true,
+      "warmth": null,
+      "humidity": null,
+      "cuesCount": 0,
+      "cuesVisible": false,
+      "celebrateVisible": true,
+      "canvasH": 552,
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "viewport": {
+        "w": 390,
+        "h": 844
+      },
+      "rootH": 844
+    },
+    "again": {
+      "badge": "Clouds",
+      "label": "Clouds",
+      "kid": "Water goes up!",
+      "why": "Warm water leaves the puddle and floats up as tiny invisible drops.",
+      "whyVisible": true,
+      "warmth": "warm28°",
+      "humidity": "air filling",
+      "cuesCount": 2,
+      "cuesVisible": true,
+      "celebrateVisible": false,
+      "canvasH": 453,
+      "pageScrollable": false,
+      "lockedScroll": true,
+      "viewport": {
+        "w": 390,
+        "h": 844
+      },
+      "rootH": 844
+    }
+  },
+  "screenshots": [
+    "screenshots/why-clouds.png",
+    "screenshots/why-scene-01.png",
+    "screenshots/why-warm-cool.png",
+    "screenshots/why-scene-02.png",
+    "screenshots/why-tiny-drops.png",
+    "screenshots/why-scene-03.png",
+    "screenshots/why-rain.png",
+    "screenshots/why-scene-05.png",
+    "screenshots/why-storm.png",
+    "screenshots/why-scene-07.png",
+    "screenshots/why-celebrate.png",
+    "screenshots/why-after-again.png"
+  ]
+}
