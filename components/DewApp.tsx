@@ -7,6 +7,7 @@ import { StageId, getStage } from "./stageConfig";
 import { useThunder } from "./useThunder";
 import { useNarrator } from "./useNarrator";
 import { useClickSound } from "./useClickSound";
+import WeatherCues from "./WeatherCues";
 
 export default function DewApp() {
   const [stageId, setStageId] = useState<StageId>(1);
@@ -24,7 +25,7 @@ export default function DewApp() {
       setCelebrating(false);
       setStageId(id);
       const s = getStage(id);
-      if (speakOn) speak(s.kidLine);
+      if (speakOn) speak(`${s.kidLine} ${s.whyLine}`);
       if (s.showLightning) {
         setFlashTrigger((n) => n + 1);
         void playSoftThunder();
@@ -41,7 +42,7 @@ export default function DewApp() {
     if (stageId === 7) {
       void playClick();
       setCelebrating(true);
-      if (speakOn) speak("Rain again!");
+      if (speakOn) speak("Rain again! You finished the rain story.");
       return;
     }
     go((stageId + 1) as StageId);
@@ -67,7 +68,7 @@ export default function DewApp() {
 
   const liveText = celebrating
     ? "Rain again! You finished the rain story."
-    : `${stage.label}. ${stage.kidLine}`;
+    : `${stage.label}. ${stage.kidLine}. ${stage.whyLine}. Warmth ${stage.tempLabel} ${stage.tempC} degrees. Wet air ${stage.humidityLabel}.`;
 
   return (
     <div
@@ -107,6 +108,11 @@ export default function DewApp() {
           >
             {celebrating ? "Yay!" : stage.label}
           </div>
+          {!celebrating && (
+            <div className="scene-weather-hud" aria-hidden>
+              <WeatherCues stage={stage} compact />
+            </div>
+          )}
           {celebrating && (
             <div className="celebrate-card" role="dialog" aria-label="Story finished">
               <p className="celebrate-emoji" aria-hidden>
@@ -132,7 +138,12 @@ export default function DewApp() {
             void playClick();
             setSpeakOn((v) => {
               const next = !v;
-              if (next) speak(celebrating ? "Rain again!" : stage.kidLine);
+              if (next)
+                speak(
+                  celebrating
+                    ? "Rain again! You finished the rain story."
+                    : `${stage.kidLine} ${stage.whyLine}`
+                );
               else stop();
               return next;
             });

@@ -3,6 +3,7 @@
 import { useEffect, useRef, type CSSProperties } from "react";
 import { STAGES, StageId, getStage } from "./stageConfig";
 import { StageIcon } from "./StageIcons";
+import WeatherCues from "./WeatherCues";
 
 export default function StageButtons({
   current,
@@ -55,8 +56,9 @@ export default function StageButtons({
               type="button"
               className={`speak-btn speak-btn-inline ${speakOn ? "on" : ""}`}
               onClick={onToggleSpeak}
-              aria-label={speakOn ? "Turn voice off" : "Turn voice on"}
+              aria-label={speakOn ? "Turn voice off" : "Turn voice on — Why it rains"}
               aria-pressed={speakOn}
+              title={speakOn ? "Voice on" : "Hear why"}
             >
               <SpeakIcon on={speakOn} />
             </button>
@@ -67,11 +69,20 @@ export default function StageButtons({
           <p className="stage-hero-kid" key={`kid-${stage.id}-${celebrating}`}>
             {celebrating ? "Tap Again to play once more." : stage.kidLine}
           </p>
-          <p className="stage-hero-caption" key={`cap-${stage.id}`}>
-            {stage.caption}
+          <p className="stage-hero-why" key={`why-${stage.id}-${celebrating}`}>
+            {celebrating
+              ? "You finished the rain story — start again anytime."
+              : stage.whyLine}
           </p>
+          {!celebrating && (
+            <p className="stage-hero-caption" key={`cap-${stage.id}`}>
+              {stage.caption}
+            </p>
+          )}
         </div>
       </div>
+
+      {!celebrating && <WeatherCues stage={stage} />}
 
       {/* Story path: scroll-snap ~3 nodes, fat-finger hit targets; Back/Next stay primary */}
       <div

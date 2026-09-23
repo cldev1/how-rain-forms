@@ -542,14 +542,26 @@ function RainStreaks({ visual }: { visual: React.MutableRefObject<VisualState> }
   );
 }
 
-function Thermometer({ visible }: { visible: boolean }) {
+function Thermometer({
+  visible,
+  warmthLevel = 0.5,
+}: {
+  visible: boolean;
+  warmthLevel?: number;
+}) {
   const needle = useRef<THREE.Mesh>(null);
   const group = useRef<THREE.Group>(null);
+  const warm = useRef(warmthLevel);
+  useEffect(() => {
+    warm.current = warmthLevel;
+  }, [warmthLevel]);
   useFrame(({ clock }) => {
     if (!group.current) return;
     group.current.visible = visible;
     if (!visible || !needle.current) return;
-    const t = (Math.sin(clock.elapsedTime * 0.85) + 1) / 2;
+    // Pulse gently around stage warmth (tied to UI meter)
+    const pulse = Math.sin(clock.elapsedTime * 0.85) * 0.06;
+    const t = Math.max(0.05, Math.min(0.95, warm.current + pulse));
     needle.current.position.y = -0.55 + t * 0.95;
     (needle.current.material as THREE.MeshStandardMaterial).color.setHSL(
       0.08 + t * 0.42,
@@ -1144,7 +1156,7 @@ export function SceneContent({
       <DrizzleMistRings visual={visual} />
       <RainPuddle visual={visual} />
       <RainUmbrella visual={visual} />
-      <Thermometer visible={stage.showThermo} />
+      <Thermometer visible={stage.showThermo} warmthLevel={stage.warmthLevel} />
       <Condensation visible={stage.showCondensation} />
       <LightningFlash active={stage.showLightning} trigger={flashTrigger} />
       <DewMascot3D mood={stage.dewMood} />

@@ -41,6 +41,32 @@ Each stage: distinct sky, cloud mood, vapor/mist/rain, props (thermo / condensat
 
 ---
 
+---
+
+## Pedagogy: why it rains
+
+Every stage teaches **cause → effect** so a parent can explain rain to ~3yo Noah without a weather-station dashboard.
+
+| # | Stage | whyLine (parent reads aloud) |
+|---|-------|------------------------------|
+| 1 | Clouds | Warm water leaves the puddle and floats up as tiny invisible drops. |
+| 2 | Warm & Cool | High up the air is colder, so the tiny drops slow down. |
+| 3 | Tiny Drops | Cold air squeezes the drops together into a soft cloud. |
+| 4 | Drizzle | The cloud gets a little heavy, so soft drops fall. |
+| 5 | Rain | The cloud is too heavy, so water falls down as rain. |
+| 6 | Lots of Rain | Even more water piles up, so lots of rain falls fast. |
+| 7 | Storm Fun | The heavy cloud rumbles and flashes while rain pours down. |
+
+**UI contract (phone @390×844):**
+- Hero always shows `kidLine` + `whyLine` (caption stays short under why).
+- **Warmth** meter: Cool → Warm with kid label (`warm` / `cooler` / `cold`) + optional °C for parent.
+- **Wet air**: 1–5 water drops (`dry` → filling → cloud heavy/full).
+- Values change clearly per stage and match the story (warm ground early → cooler + fuller mid → full when raining).
+- Speak (gesture-gated) reads `kidLine` then `whyLine`.
+- Single source of truth: `stageConfig.ts` (`whyLine`, `tempLabel`, `tempC`, `humidityLevel`, `warmthLevel`, …).
+
+---
+
 ## IA (phone-first)
 
 ```
@@ -64,4 +90,5 @@ All 7 stages tappable & **visually distinct on ~390×844** · polished kids look
 
 - **phone-trust:** viewport lock @390×844, lightning flash-gate, WebGL fallback, drizzle thickness, Dew framing.
 - **improve2** (`3682e8c`): Warm/Cool thermo + sky split + curious Dew; mid-stage silhouettes (drizzle mist rings, rain puddle shine, lots umbrella + wet grass); story-path fat-finger scroll-snap; end-of-story “Rain again!”; SoftCloud color reuse + phone rain soft-cap; speak kidLine + aria-live; dead CaptionBar/drei removed.
+- **why-rains:** per-stage `whyLine` always on phone; warmth + wet-air cues; 3D thermo tied to `warmthLevel`; speak kid+why; DESIGN pedagogy table.
 
